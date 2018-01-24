@@ -87,3 +87,33 @@ class DAXMvoxel(object):
     def pairPlane2q(self,method=""):
         pass
 
+
+if __name__ == "__main__":
+
+    # testing case
+    N = 30
+    eps = 1.0e-4
+
+    f = eps*(np.ones(9,dtype=np.float64)-2.*np.random.random(9)).reshape(3,3)
+    vec0 = (np.ones(3*N,dtype=np.float64)-2.*np.random.random(3*N)).reshape(3,N)
+    vec  = np.dot(np.eye(3,dtype=np.float64)+f,vec0)
+
+    def deviator(F):
+        try:    return np.power(np.linalg.det(F),-1.0/3.0)*F
+        except: print('determinant',np.linalg.det(F))
+
+    daxm_voxel = DAXMvoxel( coordFrame='APS',
+                            coords=np.zeros(3,dtype=np.float64),
+                            detectorImage=None,
+                            q=vec,
+                            plane=vec0,
+                            recipBase=np.eye(3,dtype=np.float64),
+                            )
+
+    print("dev_correct\n", deviator(np.eye(3,dtype=np.float64)+f))
+
+    print('dev_L2\n',deviator(daxm_voxel.deformationGradientL2()))
+
+    print('dev_opt\n', deviator(daxm_voxel.deformationGradientOptimization()))
+
+
