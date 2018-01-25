@@ -18,26 +18,45 @@ class DAXMvoxel(object):
 
     def __init__(self,
                  ref_frame='APS',
-                 coords=np.zeros(3, dtype=np.float64),
+                 coords=np.zeros(3),
                  pattern_image="dummy",
-                 scater_vecs=None,
+                 scatter_vecs=None,
                  plane=None,
-                 recip_base=np.eye(3, dtype=np.float64),
+                 recip_base=np.eye(3),
                  peaks=np.random.random((2,3)),
                  depth=0,
                 ):
         self.ref_frame = ref_frame
         self.coords = coords
         self.pattern_image = pattern_image
-        self.scater_vecs = scater_vecs
+        self.scatter_vecs = scatter_vecs
         self.plane = plane
         self.recip_base = recip_base
         self.peaks = peaks
         self.depth = depth
 
-    def read(self, h5file, label):
+    def read(self, h5file, voxelName):
         """update self with data stored in given HDF5 archive"""
-        pass
+        imgName = voxelName
+
+        def get_data(h5f, path):
+            tmpdst = h5f[path]
+            datdst = np.zeros(tmpdst.shape)
+            tmpdst.read_direct(datdst)
+            return datdst
+
+        with h5py.File(h5file, 'r') as h5f:
+            thisvoxel = h5f[imgName]
+
+            self.ref_frame = thisvoxel.attrs['ref_frame']
+
+            self.coords = get_data(thisvoxel, 'coords')
+            self.scatter_vecs = get_data(thisvoxel, 'scatter_vecs')
+            self.plane = get_data(thisvoxel, 'plane')
+            self.recip_base = get_data(thisvoxel, 'recip_base')
+            self.peaks = get_data(thisvoxel, 'peaks')
+            self.depth = get_data(thisvoxel, 'depth')
+            
 
     def write(self, h5file=None):
         """write the DAXM voxel data to a HDF5 archive"""
@@ -52,19 +71,19 @@ class DAXMvoxel(object):
             except:
                 voxelStatus = 'new'
 
-            h5f.create_dataset("{}/ref_frame".format(imgName), data=self.ref_frame)
             h5f.create_dataset("{}/coords".format(imgName), data=self.coords)
-            h5f.create_dataset("{}/scatter_vecs".format(imgName), data=self.scater_vecs)
+            h5f.create_dataset("{}/scatter_vecs".format(imgName), data=self.scatter_vecs)
             h5f.create_dataset("{}/plane".format(imgName), data=self.plane)
             h5f.create_dataset("{}/recip_base".format(imgName), data=self.recip_base)
             h5f.create_dataset("{}/peaks".format(imgName), data=self.peaks)
             h5f.create_dataset("{}/depth".format(imgName), data=self.depth)
 
+            h5f[imgName].attrs['ref_frame'] = self.ref_frame
             h5f[imgName].attrs['voxelStatus'] = voxelStatus
 
             h5f.flush()
 
-    def scater_vecs0(self):
+    def scatter_vecs0(self):
         """return the strain-free scattering vectors calculated from hkl index"""
         return np.dot(self.recip_base, self.plane)
 
@@ -87,8 +106,8 @@ class DAXMvoxel(object):
         # ==> F* q0 q0^T = q q0^T
         # ==> F* = (q q0^T)(q0 q0^T)^-1
         #              A       B
-        q0 = self.scater_vecs0()
-        q = self.scater_vecs
+        q0 = self.scatter_vecs0()
+        q = self.scatter_vecs
 
         A = np.dot(q, q0.T)
         B = np.dot(q0, q0.T)
@@ -116,7 +135,7 @@ class DAXMvoxel(object):
 
         return np.eye(3)+ scipy.optimize.minimize(objectiveIce,
                                                   x0 = np.zeros(3*3),
-                                                  args = (self.scater_vecs0(),self.scater_vecs),
+                                                  args = (self.scatter_vecs0(),self.scatter_vecs),
                                                   method = 'COBYLA',
                                                   tol = 1e-14,
                                                   constraints = {'type':'ineq',
@@ -146,17 +165,22 @@ if __name__ == "__main__":
     daxmVoxel = DAXMvoxel(ref_frame='APS',
                           coords=np.zeros(3),
                           pattern_image="dummy2",
-                          scater_vecs=test_vec,
+                          scatter_vecs=test_vec,
                           plane=test_vec0,
                           recip_base=np.eye(3),
                           peaks=np.random.random((2, 10)),
                          )
 
     print("dev_correct\n", deviator(np.eye(3)+test_f))
-
     print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
-
     print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt()))
 
     # write to single file
     daxmVoxel.write(h5file='dummy_data.h5')
+
+    # read from file 
+    daxmvoxel2 = DAXMvoxel()
+    daxmvoxel2.read('dummy_data.h5', "dummy2")
+    print("duplicate mock DAXM voxel constructed from HDF5:")
+    print('dev_L2\n', deviator(daxmvoxel2.deformation_gradientL2()))
+    print('dev_opt\n', deviator(daxmvoxel2.deformation_gradient_opt()))
