@@ -110,11 +110,8 @@ if __name__ == "__main__":
     vec0 = (np.ones(3*N,dtype=np.float64)-2.*np.random.random(3*N)).reshape(3,N)
     vec  = np.dot(np.eye(3,dtype=np.float64)+f,vec0)
 
-    from . import cm
+    from daxm_analyzer import cm
     deviator = cm.get_deviatoric_defgrad
-    # def deviator(F):
-    #     try:    return np.power(np.linalg.det(F),-1.0/3.0)*F
-    #     except: print('determinant',np.linalg.det(F))
 
     daxm_voxel = DAXMvoxel( coordFrame='APS',
                             coords=np.zeros(3,dtype=np.float64),
