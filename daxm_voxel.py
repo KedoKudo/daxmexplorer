@@ -153,9 +153,9 @@ if __name__ == "__main__":
 
     # strain quantitifiaction with mock DAXM voxel
     N = 30
-    eps = 1.0e-4
+    test_eps = 1.0e-4
 
-    test_f = eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
+    test_f = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
     test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
     test_vec  = np.dot(np.eye(3)+test_f, test_vec0)
 
