@@ -12,54 +12,59 @@ class DAXMvoxel(object):
     """
 
     def __init__(self,
-                 coordFrame='APS',
+                 ref_frame='APS',
                  coords=np.zeros(3, dtype=np.float64),
-                 detectorImage=None,
-                 q=None,
+                 pattern_image=None,
+                 scater_vecs=None,
                  plane=None,
-                 recipBase=np.eye(3, dtype=np.float64),
+                 recip_base=np.eye(3, dtype=np.float64),
                  peaks=None,
                  depth=0,
                 ):
-        self.coordFrame = coordFrame
+        self.ref_frame = ref_frame
         self.coords = coords
-        self.detectorImage = detectorImage
-        self.q = q
+        self.pattern_image = pattern_image
+        self.scater_vecs = scater_vecs
         self.plane = plane
-        self.recipBase = recipBase
+        self.recip_base = recip_base
         self.peaks = peaks
+        self.depth = depth
 
-    def fromH5(self, h5file, label):
+    def read(self, h5file, label):
         """update self with data stored in given HDF5 archive"""
         pass
 
-    def write2H5(self, h5file=None, label=None):
+    def write(self, h5file=None, label=None):
         """write the DAXM voxel data to a HDF5 archive"""
         pass
 
-    def q0(self):
-        return np.dot(self.recipBase, self.plane)
+    def scater_vecs0(self):
+        """return the strain-free scattering vectors calculated from hkl index"""
+        return np.dot(self.recip_base, self.plane)
 
-    def toAPS(self):
-        pass
+    # def toAPS(self):
+    #     pass
 
-    def toTSL(self):
-        pass
+    # def toTSL(self):
+    #     pass
 
-    def toXHF(self):
-        pass
+    # def toXHF(self):
+    #     pass
 
-    def quality(self):
-        pass
+    # def quality(self):
+    #     pass
 
-    def deformationGradientL2(self):
+    def deformation_gradientL2(self):
+        """extract lattice deformation gradient using least-squares regression(L2 optimization)"""
         # quick summary of the least square solution
         # F* q0 = q
         # ==> F* q0 q0^T = q q0^T
         # ==> F* = (q q0^T)(q0 q0^T)^-1
         #              A       B
-        q0 = self.q0()
-        A = np.dot(self.q, q0.T)
+        q0 = self.scater_vecs0()
+        q = self.scater_vecs
+
+        A = np.dot(q, q0.T)
         B = np.dot(q0, q0.T)
         # Fstar = np.dot(A, np.linalg.pinv(B))
 
@@ -67,34 +72,34 @@ class DAXMvoxel(object):
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
 
-    def deformationGradientOptimization(self):
+    def deformation_gradient_opt(self):
+        """extract lattice deformation gardient using nonlinear optimization"""
 
         import scipy.optimize
 
-        def constraint(f, e):
-            return len(f)*e - np.sum(np.abs(f))
+        def constraint(constraint_f, e):
+            return len(constraint_f)*e - np.sum(np.abs(constraint_f))
 
         def objectiveIce(f, vec0, vec):
-            estimate = np.dot(np.eye(3, dtype=np.float64)+f.reshape(3, 3), vec0)
+            estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
             return np.sum(1.0 - np.einsum('ij,ij->j',
                                           vec/np.linalg.norm(vec, axis=0),
                                           estimate/np.linalg.norm(estimate, axis=0),
                                          )
                          )
 
-        return np.eye(3)+ scipy.optimize.minimize(
-                            objectiveIce,
-                            x0 = np.zeros(3*3),
-                            args = (vec0,vec),
-                            method = 'COBYLA',
-                            tol = 1e-14,
-                            constraints = {'type':'ineq',
-                                            'fun': lambda x: constraint(x,eps),
-                                            },
-                            ).x.reshape(3,3)
+        return np.eye(3)+ scipy.optimize.minimize(objectiveIce,
+                                                  x0 = np.zeros(3*3),
+                                                  args = (self.scater_vecs0(),self.scater_vecs),
+                                                  method = 'COBYLA',
+                                                  tol = 1e-14,
+                                                  constraints = {'type':'ineq',
+                                                                 'fun': lambda x: constraint(x,eps),
+                                                                },
+                                                 ).x.reshape(3,3)
 
-    def pairPlane2q(self,method=""):
-        pass
+    # def pairPlane2q(self,method=""):
+    #     pass
 
 
 if __name__ == "__main__":
@@ -105,23 +110,23 @@ if __name__ == "__main__":
     N = 30
     eps = 1.0e-4
 
-    f = eps*(np.ones(9,dtype=np.float64)-2.*np.random.random(9)).reshape(3,3)
-    vec0 = (np.ones(3*N,dtype=np.float64)-2.*np.random.random(3*N)).reshape(3,N)
-    vec  = np.dot(np.eye(3,dtype=np.float64)+f,vec0)
+    test_f = eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
+    test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
+    test_vec  = np.dot(np.eye(3)+test_f, test_vec0)
 
     from daxm_analyzer import cm
     deviator = cm.get_deviatoric_defgrad
 
-    daxm_voxel = DAXMvoxel( coordFrame='APS',
-                            coords=np.zeros(3,dtype=np.float64),
-                            detectorImage=None,
-                            q=vec,
-                            plane=vec0,
-                            recipBase=np.eye(3,dtype=np.float64),
-                            )
+    daxmVoxel = DAXMvoxel(ref_frame='APS',
+                          coords=np.zeros(3),
+                          pattern_image=None,
+                          scater_vecs=test_vec,
+                          plane=test_vec0,
+                          recip_base=np.eye(3),
+                         )
 
-    print("dev_correct\n", deviator(np.eye(3,dtype=np.float64)+f))
+    print("dev_correct\n", deviator(np.eye(3)+test_f))
 
-    print('dev_L2\n',deviator(daxm_voxel.deformationGradientL2()))
+    print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
 
-    print('dev_opt\n', deviator(daxm_voxel.deformationGradientOptimization()))
+    print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt()))
