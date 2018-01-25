@@ -14,7 +14,6 @@ def get_deviatoric_defgrad(_defgrad):
     dim = _defgrad.shape[0]
     return np.power(np.linalg.det(_defgrad), -1.0/dim)*_defgrad
 
-
 if __name__ == "__main__":
     # module level demo 
 
