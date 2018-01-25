@@ -1,25 +1,38 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+import h5py
 import numpy as np
 
-
 class DAXMvoxel(object):
-
-    def __init__(self,
-                 coordFrame='APS',
+    """
+    DAXM voxel stores the crystallograhic information derived from DAXM indexation results. 
+    By default, all data is recoreded in the APS coordinate system. 
+    Coordinate system transformation is done via binded method.
+    """
+   
+    def __init__(self, 
+                 coordFrame='APS', 
                  coords=np.zeros(3,dtype=np.float64), 
-                 detectorImage=None,
-                 q=None,
-                 plane=None,
-                 recipBase=np.eye(3,dtype=np.float64), 
-                ):
+                 detectorImage=None, 
+                 q=None, 
+                 plane=None, 
+                 recipBase=np.eye(3,dtype=np.float64),
+                 ):
         self.coordFrame=coordFrame
         self.coords=coords
         self.detectorImage=detectorImage
         self.q=q
         self.plane=plane
         self.recipBase=recipBase
+
+    def fromH5(self, h5file, label):
+        """update self with data stored in given HDF5 archive"""
+        pass
+
+    def write2H5(self, h5file=None, label=None):
+        """write the DAXM voxel data to a HDF5 archive"""
+        pass
     
     def q0(self):
         return np.dot(self.recipBase,self.plane)
@@ -81,16 +94,15 @@ class DAXMvoxel(object):
                                             },
                             ).x.reshape(3,3)
 
-    def devDeformationGradient(self):
-        pass
-
     def pairPlane2q(self,method=""):
         pass
 
 
 if __name__ == "__main__":
 
-    # testing case
+    # read/write HDF5 support
+
+    # strain quantitifiaction with mock DAXM voxel
     N = 30
     eps = 1.0e-4
 
@@ -98,9 +110,11 @@ if __name__ == "__main__":
     vec0 = (np.ones(3*N,dtype=np.float64)-2.*np.random.random(3*N)).reshape(3,N)
     vec  = np.dot(np.eye(3,dtype=np.float64)+f,vec0)
 
-    def deviator(F):
-        try:    return np.power(np.linalg.det(F),-1.0/3.0)*F
-        except: print('determinant',np.linalg.det(F))
+    from . import cm
+    deviator = cm.get_deviatoric_defgrad
+    # def deviator(F):
+    #     try:    return np.power(np.linalg.det(F),-1.0/3.0)*F
+    #     except: print('determinant',np.linalg.det(F))
 
     daxm_voxel = DAXMvoxel( coordFrame='APS',
                             coords=np.zeros(3,dtype=np.float64),
@@ -115,5 +129,3 @@ if __name__ == "__main__":
     print('dev_L2\n',deviator(daxm_voxel.deformationGradientL2()))
 
     print('dev_opt\n', deviator(daxm_voxel.deformationGradientOptimization()))
-
-
