@@ -105,3 +105,4 @@ ENV/
 
 # testing files
 dummy_data.h5
+tests/sample.h5
