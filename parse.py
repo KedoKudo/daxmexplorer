@@ -9,7 +9,7 @@ as a parser func for interactive data analysis.
 
 import numpy as np
 import xml.etree.cElementTree as ET
-from daxmexplorer.daxm_voxel import DAXMvoxel
+from daxmexplorer.voxel import DAXMvoxel
 
 
 def parse_xml(xmlfile,
