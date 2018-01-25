@@ -146,6 +146,7 @@ class DAXMvoxel(object):
     def pair_scattervec_plane(self):
         """pair the recorded scattering vectors and the indexation results"""
         new_scatter_vec = np.zeros_like(self.plane)
+        new_peaks = np.zeros((2, self.plane.shape[1]))
 
         from daxmexplorer.vecmath import normalize
         qs = normalize(self.scatter_vecs, axis=0)   # normalize each scatter vector (column stacked)
@@ -156,9 +157,11 @@ class DAXMvoxel(object):
             # pair q0 and qs with the smallest angular difference
             idx = np.argmin(angular_diff)
             new_scatter_vec[:, i] = self.scatter_vecs[:, idx]
+            new_peaks[:, i] = self.peaks[:, idx]
 
         # update scatter vectors
         self.scatter_vecs = new_scatter_vec
+        self.peaks = new_peaks
 
 
 if __name__ == "__main__":
