@@ -16,6 +16,27 @@ class DAXMvoxel(object):
                   'depth',
                  ]
 
+    # ** XHF <-> TSL
+    theta_1 = -np.pi
+    R_XHF2TSL = np.array([[1.0,              0.0,              0.0],
+                          [0.0,  np.cos(theta_1), -np.sin(theta_1)],
+                          [0.0,  np.sin(theta_1),  np.cos(theta_1)]])
+    R_TSL2XHF = R_XHF2TSL.T
+    # ** XHF <-> APS
+    theta_2 = -0.25*np.pi
+    R_XHF2APS = np.array([[1.0,              0.0,              0.0],
+                          [0.0,  np.cos(theta_2), -np.sin(theta_2)],
+                          [0.0,  np.sin(theta_2),  np.cos(theta_2)]])
+    R_APS2XHF = R_XHF2APS.T
+    # ** APS <-> TSL
+    theta_3 = -0.75*np.pi
+    R_APS2TSL = np.array([[1.0,              0.0,              0.0],
+                          [0.0,  np.cos(theta_3), -np.sin(theta_3)],
+                          [0.0,  np.sin(theta_3),  np.cos(theta_3)]])
+    R_TSL2APS = R_APS2TSL.T
+    # ** self <-> self
+    R_TSL2TSL = R_APS2APS = R_XHF2XHF = np.eye(3)
+
     def __init__(self,
                  ref_frame='APS',
                  coords=np.zeros(3),
@@ -87,14 +108,61 @@ class DAXMvoxel(object):
         """return the strain-free scattering vectors calculated from hkl index"""
         return np.dot(self.recip_base, self.plane)
 
-    # def toAPS(self):
-    #     pass
+    def tranfer_frame(self, g):
+        """transfer reference frame with given orientation matrix, g"""
+        # NOTE: g matrix represents passive rotation
 
-    # def toTSL(self):
-    #     pass
+        # convert coordinates
+        self.coords = np.dot(g, self.coords)
 
-    # def toXHF(self):
-    #     pass
+        # convert scattering vectors
+        self.scatter_vecs = np.dot(g, self.scatter_vecs)
+
+        # convert reciprocal base
+        self.recip_base = np.dot(g, self.recip_base)
+
+    def toAPS(self):
+        """convert reference frame to APS frame"""
+        # NOTE: plane index and peaks position is tied to its own
+        #       frame.
+
+        # set the rotation matrix, but we use the orientation matrix
+        if self.ref_frame.upper() == "APS":
+            r = self.R_APS2APS
+        elif self.ref_frame.upper() == "TSL":
+            r = self.R_TSL2APS
+        elif self.ref_frame.upper() == "XHF":
+            r = self.R_XHF2APS
+        else:
+            raise ValueError("unknown framework in this voxel: {}".format(self.ref_frame))
+
+        self.tranfer_frame(r.T)
+
+    def toTSL(self):
+        """convert reference frame to TSL frame"""
+        if self.ref_frame.upper() == "APS":
+            r = self.R_APS2TSL
+        elif self.ref_frame.upper() == "TSL":
+            r = self.R_TSL2TSL
+        elif self.ref_frame.upper() == "XHF":
+            r = self.R_XHF2TSL
+        else:
+            raise ValueError("unknown framework in this voxel: {}".format(self.ref_frame))
+
+        self.tranfer_frame(r.T)      
+
+    def toXHF(self):
+        """convert reference frame to XHF frame"""
+        if self.ref_frame.upper() == "APS":
+            r = self.R_APS2XHF
+        elif self.ref_frame.upper() == "TSL":
+            r = self.R_TSL2XHF
+        elif self.ref_frame.upper() == "XHF":
+            r = self.R_XHF2XHF
+        else:
+            raise ValueError("unknown framework in this voxel: {}".format(self.ref_frame))
+
+        self.tranfer_frame(r.T)
 
     # def quality(self):
     #     pass
