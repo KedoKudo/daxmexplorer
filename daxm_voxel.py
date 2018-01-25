@@ -6,25 +6,28 @@ import numpy as np
 
 class DAXMvoxel(object):
     """
-    DAXM voxel stores the crystallograhic information derived from DAXM indexation results. 
-    By default, all data is recoreded in the APS coordinate system. 
+    DAXM voxel stores the crystallograhic information derived from DAXM indexation results.
+    By default, all data is recoreded in the APS coordinate system.
     Coordinate system transformation is done via binded method.
     """
-   
-    def __init__(self, 
-                 coordFrame='APS', 
-                 coords=np.zeros(3,dtype=np.float64), 
-                 detectorImage=None, 
-                 q=None, 
-                 plane=None, 
-                 recipBase=np.eye(3,dtype=np.float64),
-                 ):
-        self.coordFrame=coordFrame
-        self.coords=coords
-        self.detectorImage=detectorImage
-        self.q=q
-        self.plane=plane
-        self.recipBase=recipBase
+
+    def __init__(self,
+                 coordFrame='APS',
+                 coords=np.zeros(3, dtype=np.float64),
+                 detectorImage=None,
+                 q=None,
+                 plane=None,
+                 recipBase=np.eye(3, dtype=np.float64),
+                 peaks=None,
+                 depth=0,
+                ):
+        self.coordFrame = coordFrame
+        self.coords = coords
+        self.detectorImage = detectorImage
+        self.q = q
+        self.plane = plane
+        self.recipBase = recipBase
+        self.peaks = peaks
 
     def fromH5(self, h5file, label):
         """update self with data stored in given HDF5 archive"""
@@ -33,9 +36,9 @@ class DAXMvoxel(object):
     def write2H5(self, h5file=None, label=None):
         """write the DAXM voxel data to a HDF5 archive"""
         pass
-    
+
     def q0(self):
-        return np.dot(self.recipBase,self.plane)
+        return np.dot(self.recipBase, self.plane)
 
     def toAPS(self):
         pass
@@ -57,7 +60,7 @@ class DAXMvoxel(object):
         #              A       B
         q0 = self.q0()
         A = np.dot(self.q, q0.T)
-        B = np.dot(q0    , q0.T)
+        B = np.dot(q0, q0.T)
         # Fstar = np.dot(A, np.linalg.pinv(B))
 
         # F = F*^(-T) = A^-T B^T
@@ -65,23 +68,19 @@ class DAXMvoxel(object):
         return np.dot(np.linalg.inv(A).T, B.T)
 
     def deformationGradientOptimization(self):
-        
+
         import scipy.optimize
 
-        #---------------
-        def constraint(f,e):
-        #---------------
+        def constraint(f, e):
             return len(f)*e - np.sum(np.abs(f))
 
-        #---------------
-        def objectiveIce(f,vec0,vec):
-        #---------------
-            estimate = np.dot(np.eye(3,dtype=np.float64)+f.reshape(3,3),vec0)
+        def objectiveIce(f, vec0, vec):
+            estimate = np.dot(np.eye(3, dtype=np.float64)+f.reshape(3, 3), vec0)
             return np.sum(1.0 - np.einsum('ij,ij->j',
-                                            vec     /np.linalg.norm(vec     ,axis=0),
-                                            estimate/np.linalg.norm(estimate,axis=0),
-                                        )
-                        )
+                                          vec/np.linalg.norm(vec, axis=0),
+                                          estimate/np.linalg.norm(estimate, axis=0),
+                                         )
+                         )
 
         return np.eye(3)+ scipy.optimize.minimize(
                             objectiveIce,
