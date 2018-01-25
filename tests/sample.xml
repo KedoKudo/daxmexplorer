@@ -1,0 +1,201 @@
+<allsteps>
+
+<step xmlns="http://sector34.xray.aps.anl.gov/34ide:indexResult">
+	<title></title>
+	<sampleName></sampleName>
+	<userName>Bieler</userName>
+	<beamline></beamline>
+	<scanNum>17246</scanNum>
+	<date>2015-02-19T00:08:26-06:00</date>
+	<beamBad>0</beamBad>
+	<CCDshutter>out</CCDshutter>
+	<lightOn>0</lightOn>
+	<monoMode>white slitted</monoMode>
+	<Xsample>-147.7</Xsample>
+	<Ysample>2540.5</Ysample>
+	<Zsample>-4320.8</Zsample>
+	<depth>19.5</depth>
+	<energy unit="keV">19.6191</energy>
+	<hutchTemperature>23.0167</hutchTemperature>
+	<sampleDistance>0.0</sampleDistance>
+	<detector>
+		<inputImage>/data/xmd34/BielerFeb2015/bend1/poke-recon/bend1poke_sort_1_13.h5</inputImage>
+		<detectorID>PE1621 723-3335</detectorID>
+		<exposure unit="sec">0.25</exposure>
+		<Nx>2048</Nx>
+		<Ny>2048</Ny>
+		<totalSum>2857810.0</totalSum>
+		<sumAboveThreshold>432593.0</sumAboveThreshold>
+		<numAboveThreshold>1119.0</numAboveThreshold>
+		<geoFile>/data/xmd34/BielerFeb2015/geoN_2015-02-18-wireY_-10.xml</geoFile>
+		<ROI startx="0" endx="2047" groupx="1" starty="0" endy="2047" groupy="1"></ROI>
+		<peaksXY peakProgram="peaksearch" minwidth="0.2825" threshold="80.0" thresholdRatio="-1" maxRfactor="0.5" maxwidth="27.0" maxCentToFit="18.0" boxsize="18" max_number="70" min_separation="40" smooth="True" peakShape="Gaussian" Npeaks="24" executionTime="1.2">
+			<Xpixel>1268.812 1046.284 554.471 454.09 1322.898 979.038 727.381 1093.806 120.454 676.122 687.909 1415.211 1282.826 382.412 668.295 1336.649 878.015 445.876 797.292 413.334 138.266 980.593 195.243 1250.263</Xpixel>
+			<Ypixel>1590.035 1017.045 164.169 1869.542 377.026 157.14 1407.22 1180.823 1660.915 596.207 1779.601 683.641 153.168 1267.847 929.355 928.998 1462.66 563.474 1103.147 1640.271 1157.91 635.215 801.525 666.081</Ypixel>
+			<Intens>3782.8889 2020.6667 1321.6667 1112.8522 763.9701 688.7207 617.6075 598.512 504.1433 378.0035 372.7017 293.18 230.0115 213.48 206.1923 165.7371 150.4157 143.0491 142.1525 139.5316 133.055 120.3959 103.3614 88.9208</Intens>
+			<Integral>146.39796 78.14055 67.1633 39.75491 22.78177 23.8136 19.15776 17.63681 18.82896 11.51316 12.96872 9.06009 9.45519 7.49575 8.09978 4.05879 4.99064 6.07345 3.93478 5.34373 5.53777 4.5385 5.02864 2.22063</Integral>
+			<hwhmX unit="pixel">2.15 2.122 2.448 2.045 2.174 2.168 2.191 2.15 2.336 2.365 2.097 1.975 2.383 2.425 2.246 2.14 2.294 2.733 2.3 2.277 2.139 2.324 1.865 2.322</hwhmX>
+			<hwhmY unit="pixel">1.873 1.929 2.249 2.395 2.06 2.128 1.915 1.914 2.097 2.02 1.937 1.929 2.124 1.923 1.903 1.888 1.964 2.253 2.058 2.052 2.279 1.931 2.457 1.943</hwhmY>
+			<tilt unit="degree">171.0702 166.9605 140.2696 89.7655 157.6334 168.1857 163.124 168.7217 10.1564 130.2921 162.5713 27.0945 163.2507 164.5005 170.588 155.3579 8.0415 169.0095 15.6968 173.4083 53.247 174.9476 54.267 171.468</tilt>
+			<chisq>0.047345 0.04783 0.036318 0.039112 0.053034 0.049229 0.050941 0.066134 0.04616 0.059099 0.065695 0.072293 0.087448 0.074412 0.074351 0.1185 0.10261 0.10388 0.11345 0.10474 0.09218 0.14239 0.1516 0.21968</chisq>
+			<Qx>0.1597659 -0.0057386 -0.212786 0.2024209 -0.1915515 -0.2338195 0.0990768 0.0411915 0.1443517 -0.1143007 0.1909351 -0.1073529 -0.2479317 0.058693 -0.0275538 -0.0332646 0.1165467 -0.1160951 0.0185923 0.1488856 0.0303251 -0.1116909 -0.0538751 -0.1091166</Qx>
+			<Qy>0.7403531 0.7289702 0.6264222 0.6175191 0.7375848 0.6790633 0.6784928 0.7343095 0.5837947 0.6677809 0.6541396 0.7672024 0.7140097 0.6331511 0.6758552 0.7653172 0.6969959 0.6343108 0.694679 0.6249147 0.599422 0.7107825 0.6057772 0.7466461</Qy>
+			<Qz>-0.6529565 -0.6845213 -0.7498782 -0.7600631 -0.6475157 -0.6958459 -0.7278951 -0.6775639 -0.7989658 -0.7355297 -0.7318778 -0.6323573 -0.6547672 -0.7717997 -0.7365192 -0.6427931 -0.7075405 -0.7643113 -0.7190795 -0.7663646 -0.7998585 -0.6944878 -0.7938082 -0.6562112</Qz>
+		</peaksXY>
+	</detector>
+	<indexing indexProgram="euler" Nindexed="14" Npeaks="24" Npatterns="1" keVmaxCalc="16.5" keVmaxTest="30.0" angleTolerance="0.1" cone="179.0" hklPrefer="1 0 0" executionTime="0.23">
+		<!-- Result of indexing. -->
+		<pattern num="0" rms_error="0.0173" goodness="281.513" Nindexed="14">
+			<recip_lattice unit="1/nm">
+				<astar>-12.7875600 -12.2628587 -17.0479351</astar>
+				<bstar>-2.9880102 9.6374956 -22.4214620</bstar>
+				<cstar>11.2508867 -6.0391342 -4.0951787</cstar>
+			</recip_lattice>
+			<hkl_s>
+				<h>-2 -1 -2 -1 -2 -3 -2 -2 -1 -1 -2 -3 -2 -4</h>
+				<k>7 4 5 5 6 7 7 8 2 3 5 7 7 10</k>
+				<l>-4 -2 -2 -2 -2 -2 -2 -2 0 0 0 0 0 2</l>
+			</hkl_s>
+		</pattern>
+		<xtl>
+			<structureDesc>Ti hcp (hexagonal axis)</structureDesc>
+			<xtlFile>/data/xmd34/BielerFeb2015/Ti.xml</xtlFile>
+			<SpaceGroup>194</SpaceGroup>
+			<latticeParameters unit="nm">0.29508 0.29508 0.46855 90 90 120</latticeParameters>
+		</xtl>
+	</indexing>
+</step>
+
+<step xmlns="http://sector34.xray.aps.anl.gov/34ide:indexResult">
+	<title></title>
+	<sampleName></sampleName>
+	<userName>Bieler</userName>
+	<beamline></beamline>
+	<scanNum>17246</scanNum>
+	<date>2015-02-19T00:08:26-06:00</date>
+	<beamBad>0</beamBad>
+	<CCDshutter>out</CCDshutter>
+	<lightOn>0</lightOn>
+	<monoMode>white slitted</monoMode>
+	<Xsample>-147.7</Xsample>
+	<Ysample>2540.5</Ysample>
+	<Zsample>-4320.8</Zsample>
+	<depth>21.0</depth>
+	<energy unit="keV">19.6191</energy>
+	<hutchTemperature>23.0167</hutchTemperature>
+	<sampleDistance>0.0</sampleDistance>
+	<detector>
+		<inputImage>/data/xmd34/BielerFeb2015/bend1/poke-recon/bend1poke_sort_1_14.h5</inputImage>
+		<detectorID>PE1621 723-3335</detectorID>
+		<exposure unit="sec">0.25</exposure>
+		<Nx>2048</Nx>
+		<Ny>2048</Ny>
+		<totalSum>3243160.0</totalSum>
+		<sumAboveThreshold>504490.0</sumAboveThreshold>
+		<numAboveThreshold>1230.0</numAboveThreshold>
+		<geoFile>/data/xmd34/BielerFeb2015/geoN_2015-02-18-wireY_-10.xml</geoFile>
+		<ROI startx="0" endx="2047" groupx="1" starty="0" endy="2047" groupy="1"></ROI>
+		<peaksXY peakProgram="peaksearch" minwidth="0.2825" threshold="80.0" thresholdRatio="-1" maxRfactor="0.5" maxwidth="27.0" maxCentToFit="18.0" boxsize="18" max_number="70" min_separation="40" smooth="True" peakShape="Gaussian" Npeaks="24" executionTime="1.24">
+			<Xpixel>1268.395 1046.076 554.179 453.723 978.889 1322.742 727.04 120.279 1093.538 675.695 687.631 1415.402 668.125 1282.586 382.374 445.769 796.971 1336.497 413.282 137.907 878.091 980.648 195.182 1250.229</Xpixel>
+			<Ypixel>1589.813 1016.905 163.906 1869.484 156.783 376.931 1407.129 1660.92 1180.918 595.934 1779.605 683.594 929.264 153.15 1267.777 563.235 1103.191 929.046 1639.973 1157.826 1462.357 635.016 801.541 666.171</Ypixel>
+			<Intens>4260.0 2270.1111 1630.5556 1366.5325 851.3717 808.1826 776.0748 653.4836 644.5597 510.5361 475.1832 304.8342 269.1102 264.6043 251.5527 235.764 205.5724 179.0295 174.1141 170.8887 161.8183 137.0499 105.2774 103.1301</Intens>
+			<Integral>161.33731 86.76616 72.98168 45.77483 27.21854 28.78088 25.22935 24.50426 20.97949 16.62349 15.25048 9.14171 8.34056 7.98254 10.95769 8.28476 6.81054 6.86971 7.41521 6.59239 2.98449 3.07182 3.57982 3.62672</Integral>
+			<hwhmX unit="pixel">2.091 2.102 2.256 2.025 2.208 2.012 2.076 2.328 2.062 2.071 2.049 2.157 2.229 2.1 2.302 2.166 2.143 2.219 2.462 2.242 2.1 2.171 2.54 2.046</hwhmX>
+			<hwhmY unit="pixel">1.861 1.904 2.173 2.205 2.08 2.246 1.971 2.116 1.968 2.054 2.195 1.858 1.958 1.971 2.114 2.037 2.072 1.869 1.972 2.095 1.931 2.014 2.049 1.836</hwhmY>
+			<tilt unit="degree">2.8672 13.8064 52.8053 121.1058 35.0928 129.9159 7.6992 8.7592 178.6316 101.8544 84.1073 15.0603 3.9085 36.8991 154.5183 135.3332 17.2224 16.7467 168.4967 28.0323 15.0593 164.3199 24.9405 113.4942</tilt>
+			<chisq>0.046704 0.047001 0.04102 0.043666 0.039615 0.051925 0.046111 0.041913 0.045005 0.056018 0.054291 0.07816 0.071848 0.089769 0.056538 0.057635 0.086593 0.10044 0.078593 0.063086 0.14213 0.12019 0.13661 0.21989</chisq>
+			<Qx>0.1596945 -0.0057778 -0.2128303 0.2023927 -0.2338971 -0.1915717 0.0990469 0.144347 0.0412174 -0.1143585 0.1909256 -0.1073703 -0.0275764 -0.2479259 0.0586753 -0.1161493 0.0186039 -0.0332489 0.1488144 0.0303036 0.1164675 -0.111746 -0.0538703 -0.10909</Qx>
+			<Qy>0.7403159 0.728941 0.6263651 0.6174736 0.6790143 0.7375588 0.6784475 0.5837697 0.7342718 0.6677091 0.6541018 0.7672216 0.6758288 0.7139805 0.6331458 0.634285 0.6946326 0.7652985 0.6249209 0.5993701 0.6970182 0.7107799 0.6057677 0.7466451</Qy>
+			<Qz>-0.6530161 -0.6845522 -0.7499133 -0.7601076 -0.6958676 -0.6475394 -0.7279414 -0.7989849 -0.6776032 -0.7355859 -0.7319141 -0.6323311 -0.7365426 -0.6548012 -0.7718054 -0.7643245 -0.7191241 -0.6428162 -0.7663734 -0.7998982 -0.7075316 -0.6944817 -0.7938158 -0.6562168</Qz>
+		</peaksXY>
+	</detector>
+	<indexing indexProgram="euler" Nindexed="14" Npeaks="24" Npatterns="1" keVmaxCalc="16.5" keVmaxTest="30.0" angleTolerance="0.1" cone="179.0" hklPrefer="1 0 0" executionTime="0.25">
+		<!-- Result of indexing. -->
+		<pattern num="0" rms_error="0.0167" goodness="281.57" Nindexed="14">
+			<recip_lattice unit="1/nm">
+				<astar>-12.7880091 -12.2637134 -17.0469833</astar>
+				<bstar>-2.9890126 9.6365923 -22.4217166</bstar>
+				<cstar>11.2508283 -6.0391107 -4.0953740</cstar>
+			</recip_lattice>
+			<hkl_s>
+				<h>-2 -1 -2 -1 -2 -3 -2 -2 -1 -1 -2 -3 -2 -4</h>
+				<k>7 4 5 5 6 7 7 8 2 3 5 7 7 10</k>
+				<l>-4 -2 -2 -2 -2 -2 -2 -2 0 0 0 0 0 2</l>
+			</hkl_s>
+		</pattern>
+		<xtl>
+			<structureDesc>Ti hcp (hexagonal axis)</structureDesc>
+			<xtlFile>/data/xmd34/BielerFeb2015/Ti.xml</xtlFile>
+			<SpaceGroup>194</SpaceGroup>
+			<latticeParameters unit="nm">0.29508 0.29508 0.46855 90 90 120</latticeParameters>
+		</xtl>
+	</indexing>
+</step>
+
+<step xmlns="http://sector34.xray.aps.anl.gov/34ide:indexResult">
+	<title></title>
+	<sampleName></sampleName>
+	<userName>Bieler</userName>
+	<beamline></beamline>
+	<scanNum>17246</scanNum>
+	<date>2015-02-19T00:08:26-06:00</date>
+	<beamBad>0</beamBad>
+	<CCDshutter>out</CCDshutter>
+	<lightOn>0</lightOn>
+	<monoMode>white slitted</monoMode>
+	<Xsample>-147.7</Xsample>
+	<Ysample>2540.5</Ysample>
+	<Zsample>-4320.8</Zsample>
+	<depth>22.5</depth>
+	<energy unit="keV">19.6191</energy>
+	<hutchTemperature>23.0167</hutchTemperature>
+	<sampleDistance>0.0</sampleDistance>
+	<detector>
+		<inputImage>/data/xmd34/BielerFeb2015/bend1/poke-recon/bend1poke_sort_1_15.h5</inputImage>
+		<detectorID>PE1621 723-3335</detectorID>
+		<exposure unit="sec">0.25</exposure>
+		<Nx>2048</Nx>
+		<Ny>2048</Ny>
+		<totalSum>3251790.0</totalSum>
+		<sumAboveThreshold>512533.0</sumAboveThreshold>
+		<numAboveThreshold>1266.0</numAboveThreshold>
+		<geoFile>/data/xmd34/BielerFeb2015/geoN_2015-02-18-wireY_-10.xml</geoFile>
+		<ROI startx="0" endx="2047" groupx="1" starty="0" endy="2047" groupy="1"></ROI>
+		<peaksXY peakProgram="peaksearch" minwidth="0.2825" threshold="80.0" thresholdRatio="-1" maxRfactor="0.5" maxwidth="27.0" maxCentToFit="18.0" boxsize="18" max_number="70" min_separation="40" smooth="True" peakShape="Gaussian" Npeaks="25" executionTime="1.22">
+			<Xpixel>1268.243 1045.973 554.242 453.706 1322.747 978.774 727.046 120.163 1093.472 675.444 687.445 1414.89 668.092 382.343 1282.45 877.672 445.664 137.912 1336.415 796.924 980.397 412.92 1000.019 1250.13 195.214</Xpixel>
+			<Ypixel>1589.963 1016.991 163.855 1869.466 376.929 156.82 1407.263 1660.923 1180.826 595.815 1779.505 683.665 929.376 1267.922 152.8 1462.725 563.062 1157.896 929.337 1102.767 635.09 1639.753 1490.887 666.001 801.784</Ypixel>
+			<Intens>4360.2222 2251.5556 1645.3333 1419.0658 860.9793 810.113 804.6752 692.8979 689.3217 432.5262 420.1155 297.9319 280.9769 262.7691 228.1621 216.958 194.4462 193.5912 172.7009 168.7871 160.2447 147.65 134.0888 130.6166 121.4363</Intens>
+			<Integral>168.04005 86.37094 73.38678 48.03991 27.80316 25.5657 23.01612 24.92487 19.89812 14.97068 13.36815 7.63755 8.31127 8.4016 8.63896 8.88373 5.41632 5.76125 5.02743 6.31455 7.44154 5.09458 0.40999 5.78598 2.8612</Integral>
+			<hwhmX unit="pixel">2.053 1.999 2.291 2.053 2.286 2.211 2.005 2.287 1.995 2.294 2.075 2.07 1.872 2.21 2.429 2.091 2.089 2.037 2.115 2.058 2.079 2.313 1.064 1.783 2.087</hwhmX>
+			<hwhmY unit="pixel">1.902 1.89 2.167 2.163 1.959 2.027 2.107 2.193 1.94 1.992 2.144 1.942 2.12 2.081 2.085 1.872 2.278 2.145 2.171 1.748 2.144 2.049 1.148 2.056 2.326</hwhmY>
+			<tilt unit="degree">178.3768 20.276 48.9675 100.2577 22.1663 31.0002 105.5101 18.8096 23.3459 45.7028 151.9162 9.2893 153.3988 30.9996 53.3421 159.6864 144.9991 129.4021 20.2236 154.2111 5.5969 48.0134 14.3063 136.815 10.7005</tilt>
+			<chisq>0.0469 0.047134 0.040345 0.04138 0.053314 0.042645 0.049307 0.043245 0.05734 0.056166 0.061812 0.070433 0.068174 0.066116 0.062543 0.079498 0.075332 0.082579 0.10823 0.12282 0.081586 0.083649 0.30027 0.17579 0.14033</chisq>
+			<Qx>0.1597323 -0.0057528 -0.2128441 0.2023877 -0.1915722 -0.2338829 0.0990817 0.1443437 0.0411907 -0.1143819 0.1908948 -0.1073394 -0.0275465 0.0587105 -0.2480065 0.1165566 -0.1161878 0.0303199 -0.0331611 0.0184886 -0.1117199 0.1487517 0.1266257 -0.1091364 -0.0538136</Qx>
+			<Qy>0.7402874 0.7289265 0.6263687 0.6174716 0.7375584 0.6790026 0.6784425 0.5837528 0.7342635 0.6676682 0.6540828 0.7671644 0.6758243 0.6331376 0.7139319 0.6969447 0.6342621 0.5993692 0.765292 0.6946274 0.710749 0.6248806 0.7119667 0.7466242 0.6057758</Qy>
+			<Qz>-0.6530392 -0.6845678 -0.7499064 -0.7601106 -0.6475398 -0.6958838 -0.7279413 -0.7989979 -0.6776138 -0.7356194 -0.7319391 -0.6324057 -0.7365478 -0.7718095 -0.6548236 -0.7075893 -0.7643376 -0.7998983 -0.6428285 -0.7191321 -0.6945174 -0.7664184 -0.6907021 -0.6562328 -0.7938134</Qz>
+		</peaksXY>
+	</detector>
+	<indexing indexProgram="euler" Nindexed="14" Npeaks="25" Npatterns="1" keVmaxCalc="16.5" keVmaxTest="30.0" angleTolerance="0.1" cone="179.0" hklPrefer="1 0 0" executionTime="0.26">
+		<!-- Result of indexing. -->
+		<pattern num="0" rms_error="0.0172" goodness="281.505" Nindexed="14">
+			<recip_lattice unit="1/nm">
+				<astar>-12.7883780 -12.2639477 -17.0465380</astar>
+				<bstar>-2.9888497 9.6359363 -22.4220203</bstar>
+				<cstar>11.2506618 -6.0395272 -4.0952169</cstar>
+			</recip_lattice>
+			<hkl_s>
+				<h>-2 -1 -2 -1 -2 -3 -2 -2 -1 -1 -2 -3 -2 -4</h>
+				<k>7 4 5 5 6 7 7 8 2 3 5 7 7 10</k>
+				<l>-4 -2 -2 -2 -2 -2 -2 -2 0 0 0 0 0 2</l>
+			</hkl_s>
+		</pattern>
+		<xtl>
+			<structureDesc>Ti hcp (hexagonal axis)</structureDesc>
+			<xtlFile>/data/xmd34/BielerFeb2015/Ti.xml</xtlFile>
+			<SpaceGroup>194</SpaceGroup>
+			<latticeParameters unit="nm">0.29508 0.29508 0.46855 90 90 120</latticeParameters>
+		</xtl>
+	</indexing>
+</step>
+
+</allsteps>
