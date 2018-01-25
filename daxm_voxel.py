@@ -136,11 +136,11 @@ class DAXMvoxel(object):
         return np.eye(3)+ scipy.optimize.minimize(objectiveIce,
                                                   x0 = np.zeros(3*3),
                                                   args = (self.scatter_vecs0(),self.scatter_vecs),
-                                                  method = 'COBYLA',
+                                                  method = 'BFGS',
                                                   tol = 1e-14,
-                                                  constraints = {'type':'ineq',
-                                                                 'fun': lambda x: constraint(x,eps),
-                                                                },
+                                                #   constraints = {'type':'ineq',
+                                                #                  'fun': lambda x: constraint(x,eps),
+                                                #                 },
                                                  ).x.reshape(3,3)
 
     # def pairPlane2q(self,method=""):
