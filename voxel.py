@@ -147,7 +147,7 @@ class DAXMvoxel(object):
         """pair the recorded scattering vectors and the indexation results"""
         new_scatter_vec = np.zeros_like(self.plane)
 
-        from daxmexplorer.vmath import normalize
+        from daxmexplorer.vecmath import normalize
         qs = normalize(self.scatter_vecs, axis=0)   # normalize each scatter vector (column stacked)
 
         for i in range(self.plane.shape[1]):
