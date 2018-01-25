@@ -70,7 +70,7 @@ def parse_xml(xmlfile,
         h = map(float, h.split())
         k = map(float, k.split())
         l = map(float, l.split())
-        plane = np.stack((h,k,l))
+        plane = np.stack((h, k, l))
 
         # create the DAXM voxel 
         tmpvoxel = DAXMvoxel(ref_frame='APS',
@@ -85,10 +85,10 @@ def parse_xml(xmlfile,
 
         # pair scattering vectors with plane index
         tmpvoxel.pair_scattervec_plane()
-        
+      
         if h5file is not None:
             tmpvoxel.write(h5file=h5file)
-        
+     
         voxels.append(tmpvoxel)
 
     return voxels
