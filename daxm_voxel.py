@@ -10,15 +10,20 @@ class DAXMvoxel(object):
     By default, all data is recoreded in the APS coordinate system.
     Coordinate system transformation is done via binded method.
     """
+    attributes = ['ref_frame', 'coords', 
+                  'scatter_vecs', 'plane', 
+                  'recip_base', 'peaks', 
+                  'depth',
+                 ]
 
     def __init__(self,
                  ref_frame='APS',
                  coords=np.zeros(3, dtype=np.float64),
-                 pattern_image=None,
+                 pattern_image="dummy",
                  scater_vecs=None,
                  plane=None,
                  recip_base=np.eye(3, dtype=np.float64),
-                 peaks=None,
+                 peaks=np.random.random((2,3)),
                  depth=0,
                 ):
         self.ref_frame = ref_frame
@@ -34,9 +39,30 @@ class DAXMvoxel(object):
         """update self with data stored in given HDF5 archive"""
         pass
 
-    def write(self, h5file=None, label=None):
+    def write(self, h5file=None):
         """write the DAXM voxel data to a HDF5 archive"""
-        pass
+        imgName = self.pattern_image.split("/")[-1].replace(".h5", "")
+        if h5file is None:
+            h5file = imgName + "_data.h5"
+
+        with h5py.File(h5file, 'a') as h5f:
+            try:
+                del h5f[imgName]
+                voxelStatus = 'updated'
+            except:
+                voxelStatus = 'new'
+
+            h5f.create_dataset("{}/ref_frame".format(imgName), data=self.ref_frame)
+            h5f.create_dataset("{}/coords".format(imgName), data=self.coords)
+            h5f.create_dataset("{}/scatter_vecs".format(imgName), data=self.scater_vecs)
+            h5f.create_dataset("{}/plane".format(imgName), data=self.plane)
+            h5f.create_dataset("{}/recip_base".format(imgName), data=self.recip_base)
+            h5f.create_dataset("{}/peaks".format(imgName), data=self.peaks)
+            h5f.create_dataset("{}/depth".format(imgName), data=self.depth)
+
+            h5f[imgName].attrs['voxelStatus'] = voxelStatus
+
+            h5f.flush()
 
     def scater_vecs0(self):
         """return the strain-free scattering vectors calculated from hkl index"""
@@ -119,10 +145,11 @@ if __name__ == "__main__":
 
     daxmVoxel = DAXMvoxel(ref_frame='APS',
                           coords=np.zeros(3),
-                          pattern_image=None,
+                          pattern_image="dummy2",
                           scater_vecs=test_vec,
                           plane=test_vec0,
                           recip_base=np.eye(3),
+                          peaks=np.random.random((2, 10)),
                          )
 
     print("dev_correct\n", deviator(np.eye(3)+test_f))
@@ -130,3 +157,6 @@ if __name__ == "__main__":
     print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
 
     print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt()))
+
+    # write to single file
+    daxmVoxel.write(h5file='dummy_data.h5')
