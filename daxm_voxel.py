@@ -147,7 +147,7 @@ class DAXMvoxel(object):
         """pair the recorded scattering vectors and the indexation results"""
         new_scatter_vec = np.zeros_like(self.plane)
 
-        from daxm_analyzer.vector_math import normalize
+        from daxmexplorer.vector_math import normalize
         qs = normalize(self.scatter_vecs, axis=0)   # normalize each scatter vector (column stacked)
 
         for i in range(self.plane.shape[1]):
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
     test_vec  = np.dot(np.eye(3)+test_f, test_vec0)
 
-    from daxm_analyzer import cm
+    from daxmexplorer import cm
     deviator = cm.get_deviatoric_defgrad
 
     daxmVoxel = DAXMvoxel(ref_frame='APS',
