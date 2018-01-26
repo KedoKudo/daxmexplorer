@@ -174,8 +174,9 @@ class DAXMvoxel(object):
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
 
-    def deformation_gradient_opt(self):
+    def deformation_gradient_opt(self, eps=1e-1):
         """extract lattice deformation gardient using nonlinear optimization"""
+        # NOTE: a large bound guess is better than a smaller bound
 
         import scipy.optimize
 
@@ -189,15 +190,30 @@ class DAXMvoxel(object):
                                           estimate/np.linalg.norm(estimate, axis=0),
                                          )
                          )
+        
+        def objectiveKratos(f, vec0, vec):
+            estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
 
-        return np.eye(3)+ scipy.optimize.minimize(objectiveIce,
+            # angular difference
+            angdif = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
+            angdif = np.average(np.linalg.norm(angdif, axis=0))
+
+            # length difference
+            lendif = np.log(np.linalg.norm(vec,axis=0)/np.linalg.norm(estimate,axis=0))
+            tmp = np.absolute(np.linalg.norm(vec,axis=0) - 1)
+            msk = np.where(tmp > 1e-8)
+            lendif = np.average(np.absolute(lendif[msk]))
+
+            return angdif + lendif
+
+        return np.eye(3)+ scipy.optimize.minimize(objectiveKratos,
                                                   x0 = np.zeros(3*3),
                                                   args = (self.scatter_vec0(),self.scatter_vec),
-                                                  method = 'BFGS',
+                                                  method = 'COBYLA',
                                                   tol = 1e-14,
-                                                #   constraints = {'type':'ineq',
-                                                #                  'fun': lambda x: constraint(x,test_eps),
-                                                #                 },
+                                                  constraints = {'type':'ineq',
+                                                                 'fun': lambda x: constraint(x,eps),
+                                                                },
                                                  ).x.reshape(3,3)
 
     def pair_scattervec_plane(self):
@@ -227,11 +243,15 @@ if __name__ == "__main__":
 
     # strain quantitifiaction with mock DAXM voxel
     N = 30
-    test_eps = 1.0e-2
+    test_eps = 1.0e-3
 
     test_f = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
     test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
     test_vec  = np.dot(np.eye(3)+test_f, test_vec0)
+
+    # make a mixed set of scattering vectors
+    from daxmexplorer.vecmath import normalize
+    test_vec[:, 1:N/2] = normalize(test_vec[:, 1:N/2], axis=0)
 
     from daxmexplorer import cm
     deviator = cm.get_deviatoric_defgrad
@@ -249,8 +269,10 @@ if __name__ == "__main__":
     print("dev_correct\n", deviator(np.eye(3)+test_f))
     print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
     print('delta_L2', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradientL2()) ) )
-    print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt()))
-    print('delta_opt', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradient_opt()) ) )
+    print('F_opt\n', daxmVoxel.deformation_gradient_opt(eps=test_eps))
+    print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt(eps=test_eps)))
+    print('delta_opt', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradient_opt(eps=1e-1)) ) )
+    print('deltaFull_opt', np.linalg.norm(np.eye(3)+test_f - daxmVoxel.deformation_gradient_opt(eps=1e-1) ) )
 
     # write to single file
     print (daxmVoxel)
