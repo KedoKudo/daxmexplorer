@@ -196,7 +196,7 @@ class DAXMvoxel(object):
                                                   method = 'BFGS',
                                                   tol = 1e-14,
                                                 #   constraints = {'type':'ineq',
-                                                #                  'fun': lambda x: constraint(x,eps),
+                                                #                  'fun': lambda x: constraint(x,test_eps),
                                                 #                 },
                                                  ).x.reshape(3,3)
 
@@ -227,16 +227,16 @@ if __name__ == "__main__":
 
     # strain quantitifiaction with mock DAXM voxel
     N = 30
-    test_eps = 1.0e-4
+    test_eps = 1.0e-2
 
     test_f = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
     test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
     test_vec  = np.dot(np.eye(3)+test_f, test_vec0)
 
-#     from daxmexplorer import cm
-#     deviator = cm.get_deviatoric_defgrad
+    from daxmexplorer import cm
+    deviator = cm.get_deviatoric_defgrad
 
-    daxmVoxel = DAXMvoxel(name='Tigger',
+    daxmVoxel = DAXMvoxel(name='Pooh',
                           ref_frame='APS',
                           coords=np.ones(3),
                           pattern_image='hidden',
@@ -246,9 +246,11 @@ if __name__ == "__main__":
                           peak=np.random.random((2, 10)),
                          )
 
-#     print("dev_correct\n", deviator(np.eye(3)+test_f))
-#     print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
-#     print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt()))
+    print("dev_correct\n", deviator(np.eye(3)+test_f))
+    print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
+    print('delta_L2', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradientL2()) ) )
+    print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt()))
+    print('delta_opt', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradient_opt()) ) )
 
     # write to single file
     print (daxmVoxel)
