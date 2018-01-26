@@ -37,6 +37,7 @@ def parse_xml(xmlfile,
 
         # get pattern image name
         h5img = step.find('step:detector/step:inputImage', ns).text
+        voxelname = h5img.split("/")[-1].replace(".h5", "")
 
         # get peaks
         xpix = step.find('step:detector/step:peaksXY/step:Xpixel', ns).text
@@ -73,13 +74,14 @@ def parse_xml(xmlfile,
         plane = np.stack((h, k, l))
 
         # create the DAXM voxel 
-        tmpvoxel = DAXMvoxel(ref_frame='APS',
+        tmpvoxel = DAXMvoxel(name=voxelname,
+                             ref_frame='APS',
                              coords=coords,
                              pattern_image=h5img,
-                             scatter_vecs=scatter_vecs,
+                             scatter_vec=scatter_vecs,
                              plane=plane,
                              recip_base=recip_base,
-                             peaks=peaks,
+                             peak=peaks,
                              depth=depth,
                             )
 
