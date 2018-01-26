@@ -283,6 +283,3 @@ if __name__ == "__main__":
     daxmVoxel.read('dummy_data.h5', 'Pooh')
 #    daxmVoxel.name = 'copy'
     print(daxmVoxel)
-#     print("duplicate mock DAXM voxel constructed from HDF5:")
-#     print('dev_L2\n', deviator(daxmvoxel2.deformation_gradientL2()))
-#     print('dev_opt\n', deviator(daxmvoxel2.deformation_gradient_opt()))
