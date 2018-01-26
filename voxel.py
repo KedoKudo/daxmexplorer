@@ -174,7 +174,7 @@ class DAXMvoxel(object):
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
 
-    def deformation_gradient_opt(self, eps=1e-1):
+    def deformation_gradient_opt(self, eps=1e-1, lambda_len=1e0):
         """extract lattice deformation gardient using nonlinear optimization"""
         # NOTE: a large bound guess is better than a smaller bound
 
@@ -204,7 +204,7 @@ class DAXMvoxel(object):
             msk = np.where(tmp > 1e-8)
             lendif = np.average(np.absolute(lendif[msk]))
 
-            return angdif + lendif
+            return angdif + lendif*lambda_len
 
         return np.eye(3)+ scipy.optimize.minimize(objectiveKratos,
                                                   x0 = np.zeros(3*3),
