@@ -174,7 +174,7 @@ class DAXMvoxel(object):
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
 
-    def deformation_gradient_opt(self, eps=1e-1, lambda_len=1e0):
+    def deformation_gradient_opt(self, eps=1e-1):
         """extract lattice deformation gardient using nonlinear optimization"""
         # NOTE: a large bound guess is better than a smaller bound
 
@@ -194,17 +194,36 @@ class DAXMvoxel(object):
         def objectiveKratos(f, vec0, vec):
             estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
 
-            # angular difference
-            angdif = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
-            angdif = np.average(np.linalg.norm(angdif, axis=0))
+            # # angular difference
+            # angdif = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
+            # angdif = np.average(np.linalg.norm(angdif, axis=0))
 
-            # length difference
-            lendif = np.log(np.linalg.norm(vec,axis=0)/np.linalg.norm(estimate,axis=0))
-            tmp = np.absolute(np.linalg.norm(vec,axis=0) - 1)
-            msk = np.where(tmp > 1e-8)
-            lendif = np.average(np.absolute(lendif[msk]))
+            # # length difference
+            # lendif = np.log(np.linalg.norm(vec,axis=0)/np.linalg.norm(estimate,axis=0))
+            # tmp = np.absolute(np.linalg.norm(vec,axis=0) - 1)
+            # msk = np.where(tmp > 1e-8)
+            # lendif = np.average(np.absolute(lendif[msk]))
 
-            return angdif + lendif*lambda_len
+            # NOTE:
+            # The reason for the separate calculation of two diff_*_q is that numpy does something
+            # really strange when it comes to calculate two (supposed) unit vectors.
+            # Combining two calculation into one should theoreically work, but sometimes results in
+            # strange outputs. 
+
+            # use the Euclidian distance
+            # first we locate the idx of measured unit scattering vectors
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) <= 1e-8)
+            unit_vec = vec[:, idx_unit_q]/np.linalg.norm(vec[:, idx_unit_q],axis=0)
+            unit_estimate = estimate[:, idx_unit_q]/np.linalg.norm(estimate[:, idx_unit_q],axis=0)
+            diff_unit_q = np.average(np.linalg.norm(unit_vec - unit_estimate, axis=0))
+            
+            # then we calculate the distance bewteen fully characterized q
+            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-8)
+            full_vec = vec[:, idx_full_q]
+            full_estimate = estimate[:, idx_full_q]
+            diff_full_q = np.average(np.linalg.norm(full_vec - full_estimate, axis=0))
+
+            return diff_unit_q + diff_full_q
 
         return np.eye(3)+ scipy.optimize.minimize(objectiveKratos,
                                                   x0 = np.zeros(3*3),
@@ -251,7 +270,7 @@ if __name__ == "__main__":
 
     # make a mixed set of scattering vectors
     from daxmexplorer.vecmath import normalize
-    test_vec[:, 1:N/2] = normalize(test_vec[:, 1:N/2], axis=0)
+    test_vec[:, 1:N/3] = normalize(test_vec[:, 1:N/3], axis=0)
 
     from daxmexplorer import cm
     deviator = cm.get_deviatoric_defgrad
