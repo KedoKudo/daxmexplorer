@@ -15,15 +15,16 @@ class DAXMvoxel(object):
     (a;b) -> a and b row stacked
 
     @para:
-    name:          voxel ID, used as the group name in HDF5 archive
-    ref_frame:     reference frame, by default using "APS"
-    coords:        voxel position
-    pattern_image: associated reconstructed micro-Laue diffraction image name (H5)
-    scatter_vec:   measured scattering vectors (qx;qy;qz)
-    plane:         Miller index of indexed planes (h;k;l)
-    recip_base:    reciprocal base of the voxel (a*,b*,c*)
-    peak:          diffraction peak coordinates on CCD(x;y)
-    depth:         wire position
+    name:             voxel ID, used as the group name in HDF5 archive
+    ref_frame:        reference frame, by default using "APS"
+    coords:           voxel position
+    pattern_image:    associated reconstructed micro-Laue diffraction image name (H5)
+    scatter_vec:      measured scattering vectors (qx;qy;qz)
+    plane:            Miller index of indexed planes (h;k;l)
+    recip_base:       reciprocal base of the voxel (a*,b*,c*)
+    peak:             diffraction peak coordinates on CCD(x;y)
+    depth:            wire position
+    lattice_constant: lattice constant
 
     """
     # ** XHF <-> TSL
@@ -75,6 +76,7 @@ class DAXMvoxel(object):
                  recip_base=np.eye(3),
                  peak=np.random.random((2,3)),
                  depth=0,
+                 lattice_constant=np.random.random(6),
                 ):
         self.name = name
         self.ref_frame = ref_frame
@@ -85,6 +87,7 @@ class DAXMvoxel(object):
         self.recip_base = recip_base
         self.peak = peak
         self.depth = depth
+        self.lattice_constant = lattice_constant
 
     def __repr__(self):
         return '\n'.join([
@@ -112,13 +115,13 @@ class DAXMvoxel(object):
             self.pattern_image = thisvoxel.attrs['pattern_image']
             self.ref_frame     = thisvoxel.attrs['ref_frame']
 
-            self.coords       = get_data(thisvoxel, 'coords')
-            self.scatter_vec  = get_data(thisvoxel, 'scatter_vec')
-            self.plane        = get_data(thisvoxel, 'plane')
-            self.recip_base   = get_data(thisvoxel, 'recip_base')
-            self.peak         = get_data(thisvoxel, 'peak')
-            self.depth        = get_data(thisvoxel, 'depth')
-            
+            self.coords                  = get_data(thisvoxel, 'coords')
+            self.scatter_vec             = get_data(thisvoxel, 'scatter_vec')
+            self.plane                   = get_data(thisvoxel, 'plane')
+            self.recip_base              = get_data(thisvoxel, 'recip_base')
+            self.peak                    = get_data(thisvoxel, 'peak')
+            self.depth                   = get_data(thisvoxel, 'depth')
+            self.lattice_constant        = get_data(thisvoxel, 'lattice_constant')           
 
     def write(self, h5file=None):
         """write the DAXM voxel data to a HDF5 archive"""
@@ -137,6 +140,7 @@ class DAXMvoxel(object):
             h5f.create_dataset("{}/recip_base".format(self.name), data=self.recip_base)
             h5f.create_dataset("{}/peak".format(self.name), data=self.peak)
             h5f.create_dataset("{}/depth".format(self.name), data=self.depth)
+            h5f.create_dataset("{}/lattice_constant".format(self.name), data=self.lattice_constant)
 
             h5f[self.name].attrs['pattern_image'] = self.pattern_image
             h5f[self.name].attrs['ref_frame']     = self.ref_frame
