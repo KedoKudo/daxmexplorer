@@ -3,6 +3,7 @@
 from __future__ import print_function
 import h5py
 import numpy as np
+from daxmexplorer.vecmath import normalize
 
 class DAXMvoxel(object):
     """
@@ -167,9 +168,6 @@ class DAXMvoxel(object):
         # convert reciprocal base
         self.recip_base = np.dot(g_to_from[target][self.ref_frame], self.recip_base)
 
-    # def quality(self):
-    #     pass
-
     def deformation_gradientL2(self):
         """extract lattice deformation gradient using least-squares regression(L2 optimization)"""
         # quick summary of the least square solution
@@ -180,10 +178,13 @@ class DAXMvoxel(object):
         q0 = self.scatter_vec0()
         q = self.scatter_vec
 
+        idx_unit_q = np.where(np.absolute(np.linalg.norm(q,axis=0) - 1) <= 1e-8)
+        # normalized q0 when corresponding q is a unit vector
+        q0[:, idx_unit_q] = normalize(q0[:, idx_unit_q], axis=0)
+
         A = np.dot(q, q0.T)
         B = np.dot(q0, q0.T)
         # Fstar = np.dot(A, np.linalg.pinv(B))
-
         # F = F*^(-T) = A^-T B^T
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
@@ -227,8 +228,10 @@ class DAXMvoxel(object):
             # use the Euclidian distance
             # first we locate the idx of measured unit scattering vectors
             idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) <= 1e-8)
-            unit_vec = vec[:, idx_unit_q]/np.linalg.norm(vec[:, idx_unit_q],axis=0)
-            unit_estimate = estimate[:, idx_unit_q]/np.linalg.norm(estimate[:, idx_unit_q],axis=0)
+            unit_vec = normalize(vec[:, idx_unit_q], axis=0)
+            # unit_vec = vec[:, idx_unit_q]/np.linalg.norm(vec[:, idx_unit_q],axis=0)
+            unit_estimate = normalize(estimate[:, idx_unit_q], axis=0)
+            # unit_estimate = estimate[:, idx_unit_q]/np.linalg.norm(estimate[:, idx_unit_q],axis=0)
             diff_unit_q = np.average(np.linalg.norm(unit_vec - unit_estimate, axis=0))
             
             # then we calculate the distance bewteen fully characterized q
@@ -254,7 +257,6 @@ class DAXMvoxel(object):
         new_scatter_vec = np.zeros_like(self.plane)
         new_peak = np.zeros((2, self.plane.shape[1]))
 
-        from daxmexplorer.vecmath import normalize
         qs = normalize(self.scatter_vec, axis=0)   # normalize each scatter vector (column stacked)
 
         for i in range(self.plane.shape[1]):
