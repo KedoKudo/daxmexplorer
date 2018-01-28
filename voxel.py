@@ -9,13 +9,23 @@ class DAXMvoxel(object):
     DAXM voxel stores the crystallograhic information derived from DAXM indexation results.
     By default, all data is recoreded in the APS coordinate system.
     Coordinate system transformation is done via binded method.
-    """
-    attributes = ['ref_frame', 'coords', 
-                  'scatter_vec', 'plane', 
-                  'recip_base', 'peak', 
-                  'depth',
-                 ]
 
+    NOTE:
+    (a,b) -> a and b column stacked
+    (a;b) -> a and b row stacked
+
+    @para:
+    name:          voxel ID, used as the group name in HDF5 archive
+    ref_frame:     reference frame, by default using "APS"
+    coords:        voxel position
+    pattern_image: associated reconstructed micro-Laue diffraction image name (H5)
+    scatter_vec:   measured scattering vectors (qx;qy;qz)
+    plane:         Miller index of indexed planes (h;k;l)
+    recip_base:    reciprocal base of the voxel (a*,b*,c*)
+    peak:          diffraction peak coordinates on CCD(x;y)
+    depth:         wire position
+
+    """
     # ** XHF <-> TSL
     theta_1 = -np.pi
     R_XHF2TSL = np.array([[1.0,              0.0,              0.0],
