@@ -149,9 +149,14 @@ class DAXMvoxel(object):
 
             h5f.flush()
 
-    def scatter_vec0(self):
+    def scatter_vec0(self, match_measured=False):
         """return the strain-free scattering vectors calculated from hkl index"""
-        return np.dot(self.recip_base, self.plane)
+        q0 = np.dot(self.recip_base, self.plane)
+        if match_measured:
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(self.scatter_vec,axis=0) - 1) <= 1e-8)
+            q0[:, idx_unit_q] = normalize(q0[:, idx_unit_q], axis=0)
+
+        return q0
 
     def toFrame(self, target=None):
         """transfer reference frame with given orientation matrix, g"""
@@ -175,12 +180,8 @@ class DAXMvoxel(object):
         # ==> F* q0 q0^T = q q0^T
         # ==> F* = (q q0^T)(q0 q0^T)^-1
         #              A       B
-        q0 = self.scatter_vec0()
+        q0 = self.scatter_vec0(match_measured=True)
         q = self.scatter_vec
-
-        idx_unit_q = np.where(np.absolute(np.linalg.norm(q,axis=0) - 1) <= 1e-8)
-        # normalized q0 when corresponding q is a unit vector
-        q0[:, idx_unit_q] = normalize(q0[:, idx_unit_q], axis=0)
 
         A = np.dot(q, q0.T)
         B = np.dot(q0, q0.T)
@@ -194,6 +195,9 @@ class DAXMvoxel(object):
         # NOTE: a large bound guess is better than a smaller bound
 
         import scipy.optimize
+
+        q0_opt = self.scatter_vec0()
+        q_opt  = self.scatter_vec
 
         def constraint(constraint_f, e):
             return len(constraint_f)*e - np.sum(np.abs(constraint_f))
@@ -209,48 +213,25 @@ class DAXMvoxel(object):
         def objectiveKratos(f, vec0, vec):
             estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
 
-            # # angular difference
-            # angdif = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
-            # angdif = np.average(np.linalg.norm(angdif, axis=0))
-
-            # # length difference
-            # lendif = np.log(np.linalg.norm(vec,axis=0)/np.linalg.norm(estimate,axis=0))
-            # tmp = np.absolute(np.linalg.norm(vec,axis=0) - 1)
-            # msk = np.where(tmp > 1e-8)
-            # lendif = np.average(np.absolute(lendif[msk]))
-
-            # NOTE:
-            # The reason for the separate calculation of two diff_*_q is that numpy does something
-            # really strange when it comes to calculate two (supposed) unit vectors.
-            # Combining two calculation into one should theoreically work, but sometimes results in
-            # strange outputs. 
-
-            # use the Euclidian distance
-            # first we locate the idx of measured unit scattering vectors
+            # normalized those q0 corresponding to measured unit vectors
             idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) <= 1e-8)
-            unit_vec = normalize(vec[:, idx_unit_q], axis=0)
-            # unit_vec = vec[:, idx_unit_q]/np.linalg.norm(vec[:, idx_unit_q],axis=0)
-            unit_estimate = normalize(estimate[:, idx_unit_q], axis=0)
-            # unit_estimate = estimate[:, idx_unit_q]/np.linalg.norm(estimate[:, idx_unit_q],axis=0)
-            diff_unit_q = np.average(np.linalg.norm(unit_vec - unit_estimate, axis=0))
-            
-            # then we calculate the distance bewteen fully characterized q
-            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-8)
-            full_vec = vec[:, idx_full_q]
-            full_estimate = estimate[:, idx_full_q]
-            diff_full_q = np.average(np.linalg.norm(full_vec - full_estimate, axis=0))
+            estimate[:, idx_unit_q] = normalize(estimate[:, idx_unit_q])
 
-            return diff_unit_q + diff_full_q
+            return np.average(np.linalg.norm(vec - estimate, axis=0))
 
-        return np.eye(3)+ scipy.optimize.minimize(objectiveKratos,
-                                                  x0 = np.zeros(3*3),
-                                                  args = (self.scatter_vec0(),self.scatter_vec),
-                                                  method = 'COBYLA',
-                                                  tol = 1e-14,
-                                                  constraints = {'type':'ineq',
-                                                                 'fun': lambda x: constraint(x,eps),
-                                                                },
-                                                 ).x.reshape(3,3)
+        rst_opt = scipy.optimize.minimize(objectiveKratos,
+                                          x0 = np.zeros(3*3),
+                                          args = (q0_opt,q_opt),
+                                          method = 'COBYLA',
+                                          tol = 1e-14,
+                                          constraints = {'type':'ineq',
+                                                         'fun': lambda x: constraint(x,eps),
+                                                        },
+                                          options={'maxiter':10000,
+                                                  },
+                                         )
+        # print(rst_opt)
+        return np.eye(3) + rst_opt.x.reshape(3,3)
 
     def pair_scattervec_plane(self):
         """pair the recorded scattering vectors and the indexation results"""
