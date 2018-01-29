@@ -219,6 +219,20 @@ class DAXMvoxel(object):
 
             return np.average(np.linalg.norm(vec - estimate, axis=0))
 
+        def objectiveDante(f, vec0, vec):
+            estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
+
+            # angular difference
+            angdiff = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
+            angdiff = np.average(np.linalg.norm(angdiff, axis=0))
+
+            # length difference
+            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-8)
+            lendiff = np.log(np.linalg.norm(vec[:, idx_full_q],axis=0)/np.linalg.norm(estimate[:, idx_full_q],axis=0))
+            lendiff = np.average(np.absolute(lendiff))
+
+            return angdiff + lendiff
+
         rst_opt = scipy.optimize.minimize(objectiveKratos,
                                           x0 = np.zeros(3*3),
                                           args = (q0_opt,q_opt),
