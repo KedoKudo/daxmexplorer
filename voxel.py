@@ -256,7 +256,7 @@ class DAXMvoxel(object):
         old_scatter_vec = np.array(self.scatter_vec)
         old_peaks = np.array(self.peak)
 
-        new_scatter_vec = np.zeros_like(self.plane)
+        new_scatter_vec = np.zeros(self.plane.shape)
         new_peak = np.zeros((2, self.plane.shape[1]))
 
         qs = normalize(old_scatter_vec, axis=0)   # normalize each scatter vector (column stacked)
@@ -276,6 +276,8 @@ class DAXMvoxel(object):
         # update scatter vectors
         self.scatter_vec = new_scatter_vec
         self.peak = new_peak
+
+        return None
 
 
 if __name__ == "__main__":
