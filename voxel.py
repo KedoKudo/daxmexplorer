@@ -328,24 +328,3 @@ if __name__ == "__main__":
     daxmVoxel.read('dummy_data.h5', 'Cloud')
     daxmVoxel.name = 'Sephiroth'
     print("read in Cloud, change to\n", daxmVoxel)
-
-    """
-    # write to single file
-    print (daxmVoxel)
-    daxmVoxel.write(h5file='dummy_data.h5')
-
-    # read from file 
-    daxmVoxel = DAXMvoxel()
-    daxmVoxel.read('dummy_data.h5', 'voxel_0')
-    test_f = np.array([[1.00000559547,	   -2.92420480499e-05,	4.19046600097e-05],
-                 	   [-5.3382136307e-05,	1.00007741311,    	1.1424177626e-05],
-                       [9.16661328046e-05,	6.54983524562e-05,	1.00001899524]])
-    # print(daxmVoxel)
-    # print("dev_correct\n", deviator(np.eye(3)+test_f))
-    # print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
-    # print('delta_L2', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradientL2()) ) )
-    # print('F_opt\n', daxmVoxel.deformation_gradient_opt(eps=test_eps))
-    # print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt(eps=test_eps)))
-    # print('delta_opt', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradient_opt(eps=1e-1)) ) )
-    # print('deltaFull_opt', np.linalg.norm(np.eye(3)+test_f - daxmVoxel.deformation_gradient_opt(eps=1e-1) ) )
-    """
