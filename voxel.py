@@ -211,10 +211,11 @@ class DAXMvoxel(object):
                          )
         
         def objectiveKratos(f, vec0, vec):
+            # here f is actually F* - I
             estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
 
             # normalized those q0 corresponding to measured unit vectors
-            idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) <= 1e-8)
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) <= 1e-15)
             estimate[:, idx_unit_q] = normalize(estimate[:, idx_unit_q])
 
             return np.average(np.linalg.norm(vec - estimate, axis=0))
@@ -227,25 +228,27 @@ class DAXMvoxel(object):
             angdiff = np.average(np.linalg.norm(angdiff, axis=0))
 
             # length difference
-            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-8)
-            lendiff = np.log(np.linalg.norm(vec[:, idx_full_q],axis=0)/np.linalg.norm(estimate[:, idx_full_q],axis=0))
-            lendiff = np.average(np.absolute(lendiff))
+            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-16)
+            lendiff = np.linalg.norm(estimate[:, idx_full_q],axis=0) / np.linalg.norm(vec[:, idx_full_q],axis=0) 
+            lendiff = np.average(np.absolute(np.log(lendiff)))
 
             return angdiff + lendiff
 
-        rst_opt = scipy.optimize.minimize(objectiveKratos,
+        rst_opt = scipy.optimize.minimize(objectiveDante,
                                           x0 = np.zeros(3*3),
                                           args = (q0_opt,q_opt),
+                                        #   method = 'BFGS', 
                                           method = 'COBYLA',
                                           tol = 1e-14,
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
-                                          options={'maxiter':10000,
+                                          options={'maxiter':int(1e8),
                                                   },
                                          )
         # print(rst_opt)
-        return np.eye(3) + rst_opt.x.reshape(3,3)
+        fstar = np.eye(3) + rst_opt.x.reshape(3,3)
+        return np.transpose(np.linalg.inv(fstar))
 
     def pair_scattervec_plane(self):
         """pair the recorded scattering vectors and the indexation results"""
@@ -269,19 +272,67 @@ class DAXMvoxel(object):
 
 if __name__ == "__main__":
 
-    # read/write HDF5 support
+    # test the accuracy of extracted lattice deformation gradient
+    N = 30  # n_indexedPeaks
+    n = 10   # n_fullq
+    test_eps = 1e-3  # strain level (ish)
 
-    # strain quantitifiaction with mock DAXM voxel
-    N = 30
-    test_eps = 1.0e-3
+    test_dfstar = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)  # F* - I
+    test_fstar = test_dfstar + np.eye(3) 
+    test_f = np.transpose(np.linalg.inv(test_fstar))
+
+    test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)  # strain free scattering vectors
+    test_vec = np.dot(test_fstar, test_vec0)  # measured strained scattering vectors
+    test_vec[:, 1:N-n] = test_vec[:, 1:N-n] / np.linalg.norm(test_vec[:, 1:N-n], axis=0)
+    test_recip_base = np.eye(3)
+
+    daxmVoxel = DAXMvoxel(name='Pooh',
+                          ref_frame='APS',
+                          coords=np.ones(3),
+                          pattern_image='hidden',
+                          scatter_vec=test_vec,
+                          plane=test_vec0,
+                          recip_base=test_recip_base,
+                          peak=np.random.random((2, N)),
+                         )
+    test_f_L2 = daxmVoxel.deformation_gradientL2()
+    test_f_opt = daxmVoxel.deformation_gradient_opt()
+
+    from daxmexplorer.cm import get_deviatoric_defgrad
+    deviator = get_deviatoric_defgrad
+
+    print("F correct\n", test_f)
+    print("F L2\n", test_f_L2)
+    print("\t-->with error:{}".format(np.linalg.norm(test_f - test_f_L2)))
+    print("-"*20)
+    print("F_D correct\n", deviator(test_f))
+    print("F_D L2\n", deviator(test_f_L2))
+    print("\t-->with error:{}".format(np.linalg.norm(deviator(test_f) - deviator(test_f_L2))))
+    print("="*20 + "\n")
+
+    print("F correct\n", test_f)
+    print("F opt\n", test_f_opt)
+    print("\t-->with error:{}".format(np.linalg.norm(test_f - test_f_opt)))
+    print("-"*20)
+    print("F_D correct\n", deviator(test_f))
+    print("F_D opt\n", deviator(test_f_opt))
+    print("\t-->with error:{}".format(np.linalg.norm(deviator(test_f) - deviator(test_f_opt))))
+    print("="*20 + "\n")
+
+    """
 
     test_f = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
+    test_f = np.array([[1.00017810331,	   -0.00032275441548,	0.000155498948017],	
+                       [0.000200806367764,	0.999628769553,	    0.00026451772006],	
+                       [-2.83165611337e-05,	0.000127694616098,	1.00031586943]]
+                     ) - np.eye(3)
     test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
-    test_vec  = np.dot(np.eye(3)+test_f, test_vec0)
+    test_fstar = np.transpose(np.linalg.inv(np.eye(3)+test_f))
+    test_vec  = np.dot(test_fstar, test_vec0)
 
     # make a mixed set of scattering vectors
     from daxmexplorer.vecmath import normalize
-    test_vec[:, 1:N/3] = normalize(test_vec[:, 1:N/3], axis=0)
+    test_vec[:, 1:N-3] = normalize(test_vec[:, 1:N-3], axis=0)
 
     from daxmexplorer import cm
     deviator = cm.get_deviatoric_defgrad
@@ -310,6 +361,16 @@ if __name__ == "__main__":
 
     # read from file 
     daxmVoxel = DAXMvoxel()
-    daxmVoxel.read('dummy_data.h5', 'Pooh')
-#    daxmVoxel.name = 'copy'
-    print(daxmVoxel)
+    daxmVoxel.read('dummy_data.h5', 'voxel_0')
+    test_f = np.array([[1.00000559547,	   -2.92420480499e-05,	4.19046600097e-05],
+                 	   [-5.3382136307e-05,	1.00007741311,    	1.1424177626e-05],
+                       [9.16661328046e-05,	6.54983524562e-05,	1.00001899524]])
+    # print(daxmVoxel)
+    # print("dev_correct\n", deviator(np.eye(3)+test_f))
+    # print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
+    # print('delta_L2', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradientL2()) ) )
+    # print('F_opt\n', daxmVoxel.deformation_gradient_opt(eps=test_eps))
+    # print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt(eps=test_eps)))
+    # print('delta_opt', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradient_opt(eps=1e-1)) ) )
+    # print('deltaFull_opt', np.linalg.norm(np.eye(3)+test_f - daxmVoxel.deformation_gradient_opt(eps=1e-1) ) )
+    """
