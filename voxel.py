@@ -244,7 +244,7 @@ class DAXMvoxel(object):
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
-                                          options={'maxiter':int(1e8),
+                                          options={'maxiter':int(1e10),
                                                   },
                                           )
         # print(rst_opt)
