@@ -272,9 +272,10 @@ class DAXMvoxel(object):
 
 if __name__ == "__main__":
 
+    # ----- strain quantification demo ----- #
     # test the accuracy of extracted lattice deformation gradient
     N = 30  # n_indexedPeaks
-    n = 10   # n_fullq
+    n = 3   # n_fullq
     test_eps = 1e-3  # strain level (ish)
 
     test_dfstar = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)  # F* - I
@@ -319,42 +320,10 @@ if __name__ == "__main__":
     print("\t-->with error:{}".format(np.linalg.norm(deviator(test_f) - deviator(test_f_opt))))
     print("="*20 + "\n")
 
+    # ----- HDF5 support demo ----- #
+    # write and read data to HDF5 archive
+
     """
-
-    test_f = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)
-    test_f = np.array([[1.00017810331,	   -0.00032275441548,	0.000155498948017],	
-                       [0.000200806367764,	0.999628769553,	    0.00026451772006],	
-                       [-2.83165611337e-05,	0.000127694616098,	1.00031586943]]
-                     ) - np.eye(3)
-    test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)
-    test_fstar = np.transpose(np.linalg.inv(np.eye(3)+test_f))
-    test_vec  = np.dot(test_fstar, test_vec0)
-
-    # make a mixed set of scattering vectors
-    from daxmexplorer.vecmath import normalize
-    test_vec[:, 1:N-3] = normalize(test_vec[:, 1:N-3], axis=0)
-
-    from daxmexplorer import cm
-    deviator = cm.get_deviatoric_defgrad
-
-    daxmVoxel = DAXMvoxel(name='Pooh',
-                          ref_frame='APS',
-                          coords=np.ones(3),
-                          pattern_image='hidden',
-                          scatter_vec=test_vec,
-                          plane=test_vec0,
-                          recip_base=np.eye(3),
-                          peak=np.random.random((2, 10)),
-                         )
-
-    print("dev_correct\n", deviator(np.eye(3)+test_f))
-    print('dev_L2\n', deviator(daxmVoxel.deformation_gradientL2()))
-    print('delta_L2', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradientL2()) ) )
-    print('F_opt\n', daxmVoxel.deformation_gradient_opt(eps=test_eps))
-    print('dev_opt\n', deviator(daxmVoxel.deformation_gradient_opt(eps=test_eps)))
-    print('delta_opt', np.linalg.norm(deviator(np.eye(3)+test_f) - deviator(daxmVoxel.deformation_gradient_opt(eps=1e-1)) ) )
-    print('deltaFull_opt', np.linalg.norm(np.eye(3)+test_f - daxmVoxel.deformation_gradient_opt(eps=1e-1) ) )
-
     # write to single file
     print (daxmVoxel)
     daxmVoxel.write(h5file='dummy_data.h5')
