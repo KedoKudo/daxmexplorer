@@ -285,7 +285,7 @@ if __name__ == "__main__":
     # ----- strain quantification demo ----- #
     # test the accuracy of extracted lattice deformation gradient
     N = 5  # n_indexedPeaks
-    n = 3   # n_fullq
+    n = 1   # n_fullq
     test_eps = 1e-3  # strain level (ish)
     # test_eps = 0
 
@@ -293,19 +293,21 @@ if __name__ == "__main__":
     test_fstar = test_dfstar + np.eye(3) 
     test_f = np.transpose(np.linalg.inv(test_fstar))
     test_recip_base = np.eye(3) * 1.55
+    print("reciprocal base:\n", test_recip_base)
 
-    tmpidx = np.arange(-20, 20)
-    tmpidx = np.delete(tmpidx, 20)
+    tmpidx = np.arange(-10, 10)
+    tmpidx = np.delete(tmpidx, 10)
     test_plane = np.random.choice(tmpidx, N*3, replace=True).reshape(3, N)
+    print("hkl index:\n", test_plane, "\n")
+
     test_vec0 = np.dot(test_recip_base, test_plane)
-    # test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)  # strain free scattering vectors
     test_vec = np.dot(test_fstar, test_vec0)  # measured strained scattering vectors
     test_vec[:, 0:N-n] = test_vec[:, 0:N-n] / np.linalg.norm(test_vec[:, 0:N-n], axis=0)
 
     print("mimic shuffling of q vectors at APS")
     print("ordered q:\n", test_vec[:, :5])
     test_vec = test_vec[:, np.random.permutation(test_vec.shape[1])]
-    print("unordered q:\n", test_vec[:, :5])
+    print("unordered q in xml file:\n", test_vec[:, :5])
 
     daxmVoxel = DAXMvoxel(name='Cloud',
                           ref_frame='APS',
