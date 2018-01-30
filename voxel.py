@@ -287,7 +287,7 @@ if __name__ == "__main__":
     test_vec[:, 1:N-n] = test_vec[:, 1:N-n] / np.linalg.norm(test_vec[:, 1:N-n], axis=0)
     test_recip_base = np.eye(3)
 
-    daxmVoxel = DAXMvoxel(name='Pooh',
+    daxmVoxel = DAXMvoxel(name='Cloud',
                           ref_frame='APS',
                           coords=np.ones(3),
                           pattern_image='hidden',
@@ -322,6 +322,12 @@ if __name__ == "__main__":
 
     # ----- HDF5 support demo ----- #
     # write and read data to HDF5 archive
+    daxmVoxel.write(h5file='dummy_data.h5')
+    print("export DAXM voxel\n", daxmVoxel, "\n")
+    daxmVoxel = DAXMvoxel()
+    daxmVoxel.read('dummy_data.h5', 'Cloud')
+    daxmVoxel.name = 'Sephiroth'
+    print("read in Cloud, change to\n", daxmVoxel)
 
     """
     # write to single file
