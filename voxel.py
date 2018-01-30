@@ -292,11 +292,15 @@ if __name__ == "__main__":
     test_dfstar = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)  # F* - I
     test_fstar = test_dfstar + np.eye(3) 
     test_f = np.transpose(np.linalg.inv(test_fstar))
+    test_recip_base = np.eye(3) * 1.55
 
-    test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)  # strain free scattering vectors
+    tmpidx = np.arange(-20, 20)
+    tmpidx = np.delete(tmpidx, 20)
+    test_plane = np.random.choice(tmpidx, N*3, replace=True).reshape(3, N)
+    test_vec0 = np.dot(test_recip_base, test_plane)
+    # test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)  # strain free scattering vectors
     test_vec = np.dot(test_fstar, test_vec0)  # measured strained scattering vectors
     test_vec[:, 0:N-n] = test_vec[:, 0:N-n] / np.linalg.norm(test_vec[:, 0:N-n], axis=0)
-    test_recip_base = np.eye(3)
 
     print("mimic shuffling of q vectors at APS")
     print("ordered q:\n", test_vec[:, :5])
@@ -308,13 +312,13 @@ if __name__ == "__main__":
                           coords=np.ones(3),
                           pattern_image='hidden',
                           scatter_vec=test_vec,
-                          plane=test_vec0,
+                          plane=test_plane,
                           recip_base=test_recip_base,
                           peak=np.random.random((2, N)),
                          )
 
     daxmVoxel.pair_scattervec_plane()
-    print("reordered q:\n", daxmVoxel.scatter_vec)
+    print("reordered q:\n", daxmVoxel.scatter_vec[:, :5])
     print("test pairing complelte.\n")
 
     test_f_L2 = daxmVoxel.deformation_gradientL2()
