@@ -247,7 +247,7 @@ class DAXMvoxel(object):
                                           options={'maxiter':int(1e8),
                                                   },
                                           )
-        print(rst_opt)
+        # print(rst_opt)
         fstar = np.eye(3) + rst_opt.x.reshape(3,3)
         return np.transpose(np.linalg.inv(fstar))
 
