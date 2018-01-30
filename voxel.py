@@ -225,28 +225,29 @@ class DAXMvoxel(object):
 
             # angular difference
             angdiff = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
-            angdiff = np.average(np.linalg.norm(angdiff, axis=0))
+            angdiff = np.sqrt(np.mean(np.sum(np.square(angdiff))))
 
             # length difference
-            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-16)
-            lendiff = np.linalg.norm(estimate[:, idx_full_q],axis=0) / np.linalg.norm(vec[:, idx_full_q],axis=0) 
-            lendiff = np.average(np.absolute(np.log(lendiff)))
+            idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-10)
+            lendiff = np.linalg.norm(estimate[:, idx_full_q],axis=0) / np.linalg.norm(vec[:, idx_full_q],axis=0)
+            lendiff = np.sqrt(np.mean(np.sum(np.square(np.log(lendiff)))))
 
             return angdiff + lendiff
 
         rst_opt = scipy.optimize.minimize(objectiveDante,
                                           x0 = np.zeros(3*3),
                                           args = (q0_opt,q_opt),
-                                        #   method = 'BFGS', 
-                                          method = 'COBYLA',
+                                        #   method = 'Nelder-mead',  # demo error ~ 1e-14
+                                        #   method = 'BFGS',         # demo error ~ 1e-8 
+                                          method = 'COBYLA',       # demo error ~ 1e-14
                                           tol = 1e-14,
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
                                           options={'maxiter':int(1e8),
                                                   },
-                                         )
-        # print(rst_opt)
+                                          )
+        print(rst_opt)
         fstar = np.eye(3) + rst_opt.x.reshape(3,3)
         return np.transpose(np.linalg.inv(fstar))
 
@@ -284,7 +285,7 @@ if __name__ == "__main__":
 
     test_vec0 = (np.ones(3*N)-2.*np.random.random(3*N)).reshape(3, N)  # strain free scattering vectors
     test_vec = np.dot(test_fstar, test_vec0)  # measured strained scattering vectors
-    test_vec[:, 1:N-n] = test_vec[:, 1:N-n] / np.linalg.norm(test_vec[:, 1:N-n], axis=0)
+    test_vec[:, 0:N-n] = test_vec[:, 0:N-n] / np.linalg.norm(test_vec[:, 0:N-n], axis=0)
     test_recip_base = np.eye(3)
 
     daxmVoxel = DAXMvoxel(name='Cloud',
