@@ -253,18 +253,25 @@ class DAXMvoxel(object):
 
     def pair_scattervec_plane(self):
         """pair the recorded scattering vectors and the indexation results"""
+        old_scatter_vec = np.array(self.scatter_vec)
+        old_peaks = np.array(self.peak)
+
         new_scatter_vec = np.zeros_like(self.plane)
         new_peak = np.zeros((2, self.plane.shape[1]))
 
-        qs = normalize(self.scatter_vec, axis=0)   # normalize each scatter vector (column stacked)
+        qs = normalize(old_scatter_vec, axis=0)   # normalize each scatter vector (column stacked)
+        q0 = normalize(np.dot(self.recip_base, self.plane), axis=0)
 
         for i in range(self.plane.shape[1]):
-            q0 = normalize(np.dot(self.recip_base, self.plane[:, i]))
-            angular_diff = np.dot(q0.T, qs)
+            angular_diff = np.absolute(1.0 - np.dot(q0[:, i].T, qs))
             # pair q0 and qs with the smallest angular difference
             idx = np.argmin(angular_diff)
-            new_scatter_vec[:, i] = self.scatter_vec[:, idx]
-            new_peak[:, i] = self.peak[:, idx]
+            new_scatter_vec[:, i] = old_scatter_vec[:, idx]
+            new_peak[:, i] = old_peaks[:, idx]
+            # remove the paired entry
+            qs = np.delete(qs, idx, axis=1)
+            old_scatter_vec = np.delete(old_scatter_vec, idx, axis=1)
+            old_peaks = np.delete(old_peaks, idx, axis=1)
 
         # update scatter vectors
         self.scatter_vec = new_scatter_vec
@@ -275,9 +282,10 @@ if __name__ == "__main__":
 
     # ----- strain quantification demo ----- #
     # test the accuracy of extracted lattice deformation gradient
-    N = 30  # n_indexedPeaks
+    N = 5  # n_indexedPeaks
     n = 3   # n_fullq
     test_eps = 1e-3  # strain level (ish)
+    # test_eps = 0
 
     test_dfstar = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)  # F* - I
     test_fstar = test_dfstar + np.eye(3) 
@@ -288,6 +296,11 @@ if __name__ == "__main__":
     test_vec[:, 0:N-n] = test_vec[:, 0:N-n] / np.linalg.norm(test_vec[:, 0:N-n], axis=0)
     test_recip_base = np.eye(3)
 
+    print("mimic shuffling of q vectors at APS")
+    print("ordered q:\n", test_vec[:, :5])
+    test_vec = test_vec[:, np.random.permutation(test_vec.shape[1])]
+    print("unordered q:\n", test_vec[:, :5])
+
     daxmVoxel = DAXMvoxel(name='Cloud',
                           ref_frame='APS',
                           coords=np.ones(3),
@@ -297,6 +310,11 @@ if __name__ == "__main__":
                           recip_base=test_recip_base,
                           peak=np.random.random((2, N)),
                          )
+
+    daxmVoxel.pair_scattervec_plane()
+    print("reordered q:\n", daxmVoxel.scatter_vec)
+    print("test pairing complelte.\n")
+
     test_f_L2 = daxmVoxel.deformation_gradientL2()
     test_f_opt = daxmVoxel.deformation_gradient_opt()
 

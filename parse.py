@@ -87,10 +87,10 @@ def parse_xml(xmlfile,
 
         # pair scattering vectors with plane index
         tmpvoxel.pair_scattervec_plane()
-      
+
         if h5file is not None:
             tmpvoxel.write(h5file=h5file)
-     
+
         voxels.append(tmpvoxel)
 
     return voxels
