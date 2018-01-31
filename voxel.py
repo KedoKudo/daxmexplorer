@@ -153,8 +153,8 @@ class DAXMvoxel(object):
         """return the strain-free scattering vectors calculated from hkl index"""
         q0 = np.dot(self.recip_base, self.plane)
         if match_measured:
-            idx_unit_q = np.where(np.absolute(np.linalg.norm(self.scatter_vec,axis=0) - 1) <= 1e-8)
-            q0[:, idx_unit_q] = normalize(q0[:, idx_unit_q], axis=0)
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(self.scatter_vec, axis=0) - 1) <= 1e-8)
+            q0[:, idx_unit_q] = q0[:, idx_unit_q] / np.linalg.norm(q0[:, idx_unit_q], axis=0)
 
         return q0
 
@@ -194,11 +194,6 @@ class DAXMvoxel(object):
         """extract lattice deformation gardient using nonlinear optimization"""
         # NOTE: a large bound guess is better than a smaller bound
 
-        import scipy.optimize
-
-        q0_opt = self.scatter_vec0()
-        q_opt  = self.scatter_vec
-
         def constraint(constraint_f, e):
             return len(constraint_f)*e - np.sum(np.abs(constraint_f))
 
@@ -210,31 +205,41 @@ class DAXMvoxel(object):
                                          )
                          )
         
-        def objectiveKratos(f, vec0, vec):
-            # here f is actually F* - I
-            estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
+        def objective_norm(f, vec0, vec):
+            # NOTE:
+            # The threshold here cannot be too tight
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1.0) < 1e-4)
 
-            # normalized those q0 corresponding to measured unit vectors
-            idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) <= 1e-15)
-            estimate[:, idx_unit_q] = normalize(estimate[:, idx_unit_q])
+            # NOTE:
+            # An objective function should remain pure:
+            # do not modify input, work with its copy
+            vec0_matched = np.copy(vec0)
+            vec0_matched[:,idx_unit_q] /= np.linalg.norm(vec0_matched[:,idx_unit_q], axis=0)
 
-            return np.average(np.linalg.norm(vec - estimate, axis=0))
-
+            estimate = np.dot(np.eye(3)+f.reshape(3,3), vec0_matched)
+            estimate[:,idx_unit_q] /= np.linalg.norm(estimate[:,idx_unit_q], axis=0)
+            return np.sqrt(np.mean(np.square(np.linalg.norm(vec-estimate,axis=0)/np.linalg.norm(vec,axis=0))))
+            
         def objectiveDante(f, vec0, vec):
             estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
 
             # angular difference
             angdiff = vec/np.linalg.norm(vec,axis=0) - estimate/np.linalg.norm(estimate,axis=0)
-            angdiff = np.sqrt(np.mean(np.sum(np.square(angdiff))))
+            angdiff = np.sqrt(np.mean(np.sum(np.square(angdiff), axis=0)))
 
             # length difference
             idx_full_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1) > 1e-10)
             lendiff = np.linalg.norm(estimate[:, idx_full_q],axis=0) / np.linalg.norm(vec[:, idx_full_q],axis=0)
-            lendiff = np.sqrt(np.mean(np.sum(np.square(np.log(lendiff)))))
+            lendiff = np.sqrt(np.mean(np.square(np.log(lendiff))))
 
             return angdiff + lendiff
 
-        rst_opt = scipy.optimize.minimize(objectiveDante,
+        import scipy.optimize
+
+        q0_opt = self.scatter_vec0()
+        q_opt  = self.scatter_vec
+
+        rst_opt = scipy.optimize.minimize(objective_norm,
                                           x0 = np.zeros(3*3),
                                           args = (q0_opt,q_opt),
                                         #   method = 'Nelder-mead',  # demo error ~ 1e-14
@@ -244,7 +249,7 @@ class DAXMvoxel(object):
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
-                                          options={'maxiter':int(1e10),
+                                          options={'maxiter':int(1e5),
                                                   },
                                           )
         # print(rst_opt)
@@ -281,11 +286,12 @@ class DAXMvoxel(object):
 
 
 if __name__ == "__main__":
+    import sys
 
     # ----- strain quantification demo ----- #
     # test the accuracy of extracted lattice deformation gradient
     N = 5  # n_indexedPeaks
-    n = 1   # n_fullq
+    n = 0   # n_fullq
     test_eps = 1e-3  # strain level (ish)
     # test_eps = 0
 
@@ -302,7 +308,7 @@ if __name__ == "__main__":
 
     test_vec0 = np.dot(test_recip_base, test_plane)
     test_vec = np.dot(test_fstar, test_vec0)  # measured strained scattering vectors
-    test_vec[:, 0:N-n] = test_vec[:, 0:N-n] / np.linalg.norm(test_vec[:, 0:N-n], axis=0)
+    test_vec[:, n:] /= np.linalg.norm(test_vec[:, n:], axis=0)
 
     print("mimic shuffling of q vectors at APS")
     print("ordered q:\n", test_vec[:, :5])
@@ -318,6 +324,11 @@ if __name__ == "__main__":
                           recip_base=test_recip_base,
                           peak=np.random.random((2, N)),
                          )
+
+    print(daxmVoxel.scatter_vec)
+    print(daxmVoxel.scatter_vec0())
+    print(test_vec0)
+    print(daxmVoxel.scatter_vec0() - test_vec0)
 
     daxmVoxel.pair_scattervec_plane()
     print("reordered q:\n", daxmVoxel.scatter_vec[:, :5])
@@ -342,8 +353,8 @@ if __name__ == "__main__":
     print("F opt\n", test_f_opt)
     print("\t-->with error:{}".format(np.linalg.norm(test_f - test_f_opt)))
     print("-"*20)
-    print("F_D correct\n", deviator(test_f))
-    print("F_D opt\n", deviator(test_f_opt))
+    print("F_D correct\n", deviator(test_f)-np.eye(3))
+    print("F_D opt\n", deviator(test_f_opt)-np.eye(3))
     print("\t-->with error:{}".format(np.linalg.norm(deviator(test_f) - deviator(test_f_opt))))
     print("="*20 + "\n")
 
