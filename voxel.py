@@ -153,7 +153,7 @@ class DAXMvoxel(object):
         """return the strain-free scattering vectors calculated from hkl index"""
         q0 = np.dot(self.recip_base, self.plane)
         if match_measured:
-            idx_unit_q = np.where(np.absolute(np.linalg.norm(self.scatter_vec, axis=0) - 1) <= 1e-8)
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(self.scatter_vec, axis=0) - 1) <= 1e-4)
             q0[:, idx_unit_q] /= np.linalg.norm(q0[:, idx_unit_q], axis=0)
 
         return q0
@@ -290,7 +290,7 @@ if __name__ == "__main__":
 
     # ----- strain quantification demo ----- #
     # test the accuracy of extracted lattice deformation gradient
-    N = 5  # n_indexedPeaks
+    N = 30  # n_indexedPeaks
     n = 0   # n_fullq
     test_eps = 1e-3  # strain level (ish)
     # test_eps = 0
