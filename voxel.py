@@ -154,7 +154,7 @@ class DAXMvoxel(object):
         q0 = np.dot(self.recip_base, self.plane)
         if match_measured:
             idx_unit_q = np.where(np.absolute(np.linalg.norm(self.scatter_vec, axis=0) - 1) <= 1e-8)
-            q0[:, idx_unit_q] = q0[:, idx_unit_q] / np.linalg.norm(q0[:, idx_unit_q], axis=0)
+            q0[:, idx_unit_q] /= np.linalg.norm(q0[:, idx_unit_q], axis=0)
 
         return q0
 
