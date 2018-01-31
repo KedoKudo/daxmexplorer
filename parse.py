@@ -13,7 +13,8 @@ from daxmexplorer.voxel import DAXMvoxel
 
 
 def parse_xml(xmlfile,
-              namespace={'step':'http://sector34.xray.aps.anl.gov/34ide:indexResult'}, 
+              namespace={'step':'http://sector34.xray.aps.anl.gov/34ide:indexResult'},
+              autopair=False, 
               h5file=None):
     voxels = []
     tree = ET.parse(xmlfile)
@@ -86,7 +87,8 @@ def parse_xml(xmlfile,
                             )
 
         # pair scattering vectors with plane index
-        tmpvoxel.pair_scattervec_plane()
+        if autopair:
+            tmpvoxel.pair_scattervec_plane()
 
         if h5file is not None:
             tmpvoxel.write(h5file=h5file)
