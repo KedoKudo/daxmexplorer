@@ -329,17 +329,14 @@ if __name__ == "__main__":
                           peak=np.random.random((2, N)),
                          )
 
-    print(daxmVoxel.scatter_vec)
-    print(daxmVoxel.scatter_vec0())
-    print(test_vec0)
-    print(daxmVoxel.scatter_vec0() - test_vec0)
-
     daxmVoxel.pair_scattervec_plane()
     print("reordered q:\n", daxmVoxel.scatter_vec[:, :5])
     print("test pairing complelte.\n")
 
     test_f_L2 = daxmVoxel.deformation_gradientL2()
     test_f_opt = daxmVoxel.deformation_gradient_opt()
+
+    print(daxmVoxel.opt_rst, "\n")
 
     from daxmexplorer.cm import get_deviatoric_defgrad
     deviator = get_deviatoric_defgrad
