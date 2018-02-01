@@ -89,6 +89,7 @@ class DAXMvoxel(object):
         self.peak = peak
         self.depth = depth
         self.lattice_constant = lattice_constant
+        self.opt_rst = None
 
     def __repr__(self):
         return '\n'.join([
@@ -239,7 +240,7 @@ class DAXMvoxel(object):
         q0_opt = self.scatter_vec0()
         q_opt  = self.scatter_vec
 
-        rst_opt = scipy.optimize.minimize(objective_norm,
+        self.opt_rst = scipy.optimize.minimize(objective_norm,
                                           x0 = np.zeros(3*3),
                                           args = (q0_opt,q_opt),
                                         #   method = 'Nelder-mead',  # demo error ~ 1e-14
@@ -249,11 +250,11 @@ class DAXMvoxel(object):
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
-                                          options={'maxiter':int(1e5),
+                                          options={'maxiter':int(1e6),
                                                   },
                                           )
-        # print(rst_opt)
-        fstar = np.eye(3) + rst_opt.x.reshape(3,3)
+        # print(self.opt_rst)
+        fstar = np.eye(3) + self.opt_rst.x.reshape(3,3)
         return np.transpose(np.linalg.inv(fstar))
 
     def pair_scattervec_plane(self):
