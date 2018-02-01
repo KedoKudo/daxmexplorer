@@ -293,15 +293,13 @@ if __name__ == "__main__":
     # test the accuracy of extracted lattice deformation gradient
     N = 30  # n_indexedPeaks
     n = 0   # n_fullq
-    test_eps = 1e-5  # strain level (ish)
+    test_eps = 1e-2  # strain level (ish)
     # test_eps = 0
 
     test_df = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)  # F - I
     test_f = np.eye(3) + test_df
     test_fstar = np.transpose(np.linalg.inv(test_f))
-    # test_dfstar = test_eps*(np.ones(9)-2.*np.random.random(9)).reshape(3,3)  # F* - I
-    # test_fstar = test_dfstar + np.eye(3) 
-    # test_f = np.transpose(np.linalg.inv(test_fstar))
+
     test_recip_base = np.eye(3) * 1.55
     print("reciprocal base:\n", test_recip_base)
 
@@ -333,13 +331,11 @@ if __name__ == "__main__":
     print("reordered q:\n", daxmVoxel.scatter_vec[:, :5])
     print("test pairing complelte.\n")
 
-    test_f_L2 = daxmVoxel.deformation_gradientL2()
-    test_f_opt = daxmVoxel.deformation_gradient_opt()
-
-    print(daxmVoxel.opt_rst, "\n")
-
     from daxmexplorer.cm import get_deviatoric_defgrad
     deviator = get_deviatoric_defgrad
+
+    # ----- L2 method ----- #
+    test_f_L2 = daxmVoxel.deformation_gradientL2()
 
     print("F correct\n", test_f)
     print("F L2\n", test_f_L2)
@@ -349,6 +345,10 @@ if __name__ == "__main__":
     print("F_D L2\n", deviator(test_f_L2))
     print("\t-->with error:{}".format(np.linalg.norm(deviator(test_f) - deviator(test_f_L2))))
     print("="*20 + "\n")
+
+    # ----- opt method ----- #
+    test_f_opt = daxmVoxel.deformation_gradient_opt()
+    print(daxmVoxel.opt_rst, "\n")
 
     print("F correct\n", test_f)
     print("F opt\n", test_f_opt)
