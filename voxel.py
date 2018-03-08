@@ -202,7 +202,7 @@ class DAXMvoxel(object):
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
 
-    def deformation_gradient_opt(self, eps=1e-1):
+    def deformation_gradient_opt(self, eps=1e-1, tol=1e-14):
         """extract lattice deformation gardient using nonlinear optimization"""
         # NOTE: a large bound guess is better than a smaller bound
 
@@ -257,7 +257,7 @@ class DAXMvoxel(object):
                                         #   method = 'Nelder-mead',  # demo error ~ 1e-14
                                         #   method = 'BFGS',         # demo error ~ 1e-8 
                                           method = 'COBYLA',       # demo error ~ 1e-14
-                                          tol = 1e-14,
+                                          tol = tol,
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
