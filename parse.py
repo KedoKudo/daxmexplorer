@@ -14,7 +14,8 @@ from daxmexplorer.voxel import DAXMvoxel
 
 def parse_xml(xmlfile,
               namespace={'step':'http://sector34.xray.aps.anl.gov/34ide:indexResult'},
-              autopair=False, 
+              autopair=False,
+              forceNaNtoZero=True, 
               h5file=None):
     voxels = []
     tree = ET.parse(xmlfile)
@@ -34,7 +35,12 @@ def parse_xml(xmlfile,
         ysample = float(step.find('step:Ysample', ns).text)
         zsample = float(step.find('step:Zsample', ns).text)
         depth = float(step.find('step:depth', ns).text)
-        coords = np.array([xsample, ysample, -zsample+depth])
+
+        # for scans with no wire, depth will be nan, which should be consider as zero.
+        if forceNaNtoZero:
+            depth = 0.0 if np.isnan(depth) else depth
+
+        coords = np.array([-xsample, -ysample, -zsample+depth])
 
         # get pattern image name
         h5img = step.find('step:detector/step:inputImage', ns).text
