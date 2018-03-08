@@ -271,7 +271,11 @@ class DAXMvoxel(object):
     def pair_scattervec_plane(self):
         """pair the recorded scattering vectors and the indexation results"""
         old_scatter_vec = np.array(self.scatter_vec)
-        old_peaks = np.array(self.peak)
+
+        if self.peak.shape[0] < old_scatter_vec.shape[0]:
+            old_peaks = np.zeros((2, self.scatter_vec.shape[1]))
+        else:
+            old_peaks = np.array(self.peak)
 
         new_scatter_vec = np.zeros(self.plane.shape)
         new_peak = np.zeros((2, self.plane.shape[1]))
@@ -285,6 +289,7 @@ class DAXMvoxel(object):
             idx = np.argmin(angular_diff)
             new_scatter_vec[:, i] = old_scatter_vec[:, idx]
             new_peak[:, i] = old_peaks[:, idx]
+
             # remove the paired entry
             qs = np.delete(qs, idx, axis=1)
             old_scatter_vec = np.delete(old_scatter_vec, idx, axis=1)
