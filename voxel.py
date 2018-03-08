@@ -90,6 +90,7 @@ class DAXMvoxel(object):
         self.depth = depth
         self.lattice_constant = lattice_constant
         self.opt_rst = None
+        self.strain = None
 
     def __repr__(self):
         return '\n'.join([
@@ -123,7 +124,10 @@ class DAXMvoxel(object):
             self.recip_base              = get_data(thisvoxel, 'recip_base')
             self.peak                    = get_data(thisvoxel, 'peak')
             self.depth                   = get_data(thisvoxel, 'depth')
-            self.lattice_constant        = get_data(thisvoxel, 'lattice_constant')           
+            self.lattice_constant        = get_data(thisvoxel, 'lattice_constant')
+
+            if "{}/{}".format(thisvoxel, 'strain') in h5f.keys():
+                self.strain = get_data(thisvoxel, 'strain')
 
     def write(self, h5file=None):
         """write the DAXM voxel data to a HDF5 archive"""
@@ -144,9 +148,13 @@ class DAXMvoxel(object):
             h5f.create_dataset("{}/depth".format(self.name), data=self.depth)
             h5f.create_dataset("{}/lattice_constant".format(self.name), data=self.lattice_constant)
 
+            if self.strain is not None:
+                h5f.create_dataset("{}/strain".format(self.name), data=self.strain)
+
             h5f[self.name].attrs['pattern_image'] = self.pattern_image
             h5f[self.name].attrs['ref_frame']     = self.ref_frame
             h5f[self.name].attrs['voxelStatus']   = voxelStatus
+
 
             h5f.flush()
 
@@ -161,6 +169,7 @@ class DAXMvoxel(object):
 
     def toFrame(self, target=None):
         """transfer reference frame with given orientation matrix, g"""
+        g_to_from = self.g_to_from
         if target is None: return
         if target not in g_to_from: raise Exception
         # NOTE: g matrix represents passive rotation
@@ -173,6 +182,8 @@ class DAXMvoxel(object):
 
         # convert reciprocal base
         self.recip_base = np.dot(g_to_from[target][self.ref_frame], self.recip_base)
+
+        self.ref_frame = target
 
     def deformation_gradientL2(self):
         """extract lattice deformation gradient using least-squares regression(L2 optimization)"""
