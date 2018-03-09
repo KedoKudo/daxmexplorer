@@ -202,7 +202,10 @@ class DAXMvoxel(object):
         # inverting B can be dangerous
         return np.dot(np.linalg.inv(A).T, B.T)
 
-    def deformation_gradient_opt(self, eps=1e-1, tol=1e-14):
+    def deformation_gradient_opt(self, 
+                                 eps=1e-1, 
+                                 tol=1e-14,
+                                 maxiter=5e6):
         """extract lattice deformation gardient using nonlinear optimization"""
         # NOTE: a large bound guess is better than a smaller bound
 
@@ -226,6 +229,7 @@ class DAXMvoxel(object):
             # An objective function should remain pure:
             # do not modify input, work with its copy
             vec0_matched = np.copy(vec0)
+            # the normalization here might not be necessary
             vec0_matched[:,idx_unit_q] /= np.linalg.norm(vec0_matched[:,idx_unit_q], axis=0)
 
             estimate = np.dot(np.eye(3)+f.reshape(3,3), vec0_matched)
@@ -261,7 +265,7 @@ class DAXMvoxel(object):
                                           constraints = {'type':'ineq',
                                                          'fun': lambda x: constraint(x,eps),
                                                         },
-                                          options={'maxiter':int(5e6),
+                                          options={'maxiter':int(maxiter),
                                                   },
                                           )
         # print(self.opt_rst)
