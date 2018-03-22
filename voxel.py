@@ -4,6 +4,7 @@ from __future__ import print_function
 import h5py
 import numpy as np
 from daxmexplorer.vecmath import normalize
+from daxmexplorer.cxtallite import OrientationMatrix
 
 class DAXMvoxel(object):
     """
@@ -99,6 +100,21 @@ class DAXMvoxel(object):
           'coords: {}'.format(self.coords),
           'image: {}'.format(self.pattern_image),
         ])
+
+    @property
+    def eulers(self):
+        """ Calculate the Bunge Euler angle representation"""
+        astar = self.recip_base[:, 0]
+        bstar = self.recip_base[:, 1]
+        cstar = self.recip_base[:, 2]
+        # calcualte the real base
+        c = normalize(np.cross(astar, bstar))
+        a = normalize(np.cross(bstar, cstar))
+        b = normalize(np.cross(c, a))
+        # get the orientation matrix representation
+        g = np.column_stack((a, b, c))
+        return OrientationMatrix(g).toEulers()
+
 
     def read(self, h5file, voxelName=None):
         """update self with data stored in given HDF5 archive"""
