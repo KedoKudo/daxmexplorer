@@ -403,3 +403,5 @@ if __name__ == "__main__":
     daxmVoxel.read('dummy_data.h5', 'Cloud')
     daxmVoxel.name = 'Sephiroth'
     print("read in Cloud, change to\n", daxmVoxel)
+    print(daxmVoxel.recip_base)
+    print(daxmVoxel.eulers)
