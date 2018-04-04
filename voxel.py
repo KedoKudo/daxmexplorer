@@ -236,7 +236,7 @@ class DAXMvoxel(object):
                                          )
                          )
         
-        def objective_norm(f, vec0, vec):
+        def objective_rmsNorm(f, vec0, vec):
             # NOTE:
             # The threshold here cannot be too tight
             idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1.0) < 1e-4)
