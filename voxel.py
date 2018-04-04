@@ -251,7 +251,23 @@ class DAXMvoxel(object):
             estimate = np.dot(np.eye(3)+f.reshape(3,3), vec0_matched)
             estimate[:,idx_unit_q] /= np.linalg.norm(estimate[:,idx_unit_q], axis=0)
             return np.sqrt(np.mean(np.square(np.linalg.norm(vec-estimate,axis=0)/np.linalg.norm(vec,axis=0))))
-            
+
+        def objective_medianNorm(f, vec0, vec):
+            # NOTE:
+            # The threshold here cannot be too tight
+            idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1.0) < 1e-4)
+
+            # NOTE:
+            # An objective function should remain pure:
+            # do not modify input, work with its copy
+            vec0_matched = np.copy(vec0)
+            # the normalization here might not be necessary
+            vec0_matched[:,idx_unit_q] /= np.linalg.norm(vec0_matched[:,idx_unit_q], axis=0)
+
+            estimate = np.dot(np.eye(3)+f.reshape(3,3), vec0_matched)
+            estimate[:,idx_unit_q] /= np.linalg.norm(estimate[:,idx_unit_q], axis=0)
+            return np.median(np.linalg.norm(vec-estimate,axis=0)/np.linalg.norm(vec,axis=0))
+    
         def objectiveDante(f, vec0, vec):
             estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
 
@@ -271,7 +287,7 @@ class DAXMvoxel(object):
         q0_opt = self.scatter_vec0()
         q_opt  = self.scatter_vec
 
-        self.opt_rst = scipy.optimize.minimize(objective_norm,
+        self.opt_rst = scipy.optimize.minimize(objective_medianNorm,
                                           x0 = np.zeros(3*3),
                                           args = (q0_opt,q_opt),
                                         #   method = 'Nelder-mead',  # demo error ~ 1e-14
