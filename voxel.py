@@ -287,19 +287,19 @@ class DAXMvoxel(object):
         q0_opt = self.scatter_vec0()
         q_opt  = self.scatter_vec
 
-        self.opt_rst = scipy.optimize.minimize(objective_medianNorm,
-                                          x0 = np.zeros(3*3),
-                                          args = (q0_opt,q_opt),
+        self.opt_rst = scipy.optimize.minimize(objective_smrNorm,
+                                               x0 = np.zeros(3*3),
+                                               args = (q0_opt,q_opt),
                                         #   method = 'Nelder-mead',  # demo error ~ 1e-14
                                         #   method = 'BFGS',         # demo error ~ 1e-8 
-                                          method = 'COBYLA',       # demo error ~ 1e-14
-                                          tol = tol,
-                                          constraints = {'type':'ineq',
-                                                         'fun': lambda x: constraint(x,eps),
-                                                        },
-                                          options={'maxiter':int(maxiter),
-                                                  },
-                                          )
+                                               method = 'COBYLA',       # demo error ~ 1e-14
+                                               tol = tol,
+                                               constraints = {'type':'ineq',
+                                                              'fun': lambda x: constraint(x,eps),
+                                                             },
+                                               options={'maxiter':int(maxiter),
+                                                       },
+                                                )
         # print(self.opt_rst)
         fstar = np.eye(3) + self.opt_rst.x.reshape(3,3)
         return np.transpose(np.linalg.inv(fstar))
@@ -381,7 +381,7 @@ if __name__ == "__main__":
 
     daxmVoxel.pair_scattervec_plane()
     print("reordered q:\n", daxmVoxel.scatter_vec[:, :5])
-    print("test pairing complelte.\n")
+    print("test pairing complete.\n")
 
     from daxmexplorer.cm import get_deviatoric_defgrad
     deviator = get_deviatoric_defgrad
