@@ -252,7 +252,7 @@ class DAXMvoxel(object):
             estimate[:,idx_unit_q] /= np.linalg.norm(estimate[:,idx_unit_q], axis=0)
             return np.sqrt(np.mean(np.square(np.linalg.norm(vec-estimate,axis=0)/np.linalg.norm(vec,axis=0))))
 
-        def objective_medianNorm(f, vec0, vec):
+        def objective_smrNorm(f, vec0, vec):
             # NOTE:
             # The threshold here cannot be too tight
             idx_unit_q = np.where(np.absolute(np.linalg.norm(vec,axis=0) - 1.0) < 1e-4)
@@ -266,7 +266,7 @@ class DAXMvoxel(object):
 
             estimate = np.dot(np.eye(3)+f.reshape(3,3), vec0_matched)
             estimate[:,idx_unit_q] /= np.linalg.norm(estimate[:,idx_unit_q], axis=0)
-            return np.median(np.linalg.norm(vec-estimate,axis=0)/np.linalg.norm(vec,axis=0))
+            return np.square(np.mean(np.sqrt(np.linalg.norm(vec-estimate,axis=0)/np.linalg.norm(vec,axis=0))))
     
         def objectiveDante(f, vec0, vec):
             estimate = np.dot(np.eye(3)+f.reshape(3, 3), vec0)
