@@ -287,7 +287,7 @@ class DAXMvoxel(object):
         q0_opt = self.scatter_vec0()
         q_opt  = self.scatter_vec
 
-        self.opt_rst = scipy.optimize.minimize(objective_smrNorm,
+        self.opt_rst = scipy.optimize.minimize(objective_rmsNorm,
                                                x0 = np.zeros(3*3),
                                                args = (q0_opt,q_opt),
                                         #   method = 'Nelder-mead',  # demo error ~ 1e-14
