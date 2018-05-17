@@ -3,6 +3,7 @@
 from __future__ import print_function
 import h5py
 import numpy as np
+import sys
 from daxmexplorer.vecmath import normalize
 from daxmexplorer.cxtallite import OrientationMatrix
 
