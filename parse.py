@@ -49,35 +49,35 @@ def parse_xml(xmlfile,
         # get peaks
         xpix = step.find('step:detector/step:peaksXY/step:Xpixel', ns).text
         ypix = step.find('step:detector/step:peaksXY/step:Ypixel', ns).text
-        xpix = np.nan if xpix is None else map(float, xpix.split())
-        ypix = np.nan if ypix is None else map(float, ypix.split())
+        xpix = np.nan if xpix is None else list(map(float, xpix.split()))
+        ypix = np.nan if ypix is None else list(map(float, ypix.split()))
         peaks = np.stack((xpix, ypix))
 
         # get scattering vectors 
         qx = step.find('step:detector/step:peaksXY/step:Qx', ns).text
         qy = step.find('step:detector/step:peaksXY/step:Qy', ns).text
         qz = step.find('step:detector/step:peaksXY/step:Qz', ns).text
-        qx = map(float, qx.split())
-        qy = map(float, qy.split())
-        qz = map(float, qz.split())
+        qx = list(map(float, qx.split()))
+        qy = list(map(float, qy.split()))
+        qz = list(map(float, qz.split()))
         scatter_vecs = np.stack((qx, qy, qz))
 
         # get reciprocal base (a*, b*, c*)
         astar_str = 'step:indexing/step:pattern/step:recip_lattice/step:astar'
         bstar_str = 'step:indexing/step:pattern/step:recip_lattice/step:bstar'
         cstar_str = 'step:indexing/step:pattern/step:recip_lattice/step:cstar'
-        astar = map(float, step.find(astar_str, ns).text.split())
-        bstar = map(float, step.find(bstar_str, ns).text.split())
-        cstar = map(float, step.find(cstar_str, ns).text.split())
+        astar = list(map(float, step.find(astar_str, ns).text.split()))
+        bstar = list(map(float, step.find(bstar_str, ns).text.split()))
+        cstar = list(map(float, step.find(cstar_str, ns).text.split()))
         recip_base = np.column_stack((astar, bstar, cstar))
 
         # get plane index (hkl)
         h = step.find('step:indexing/step:pattern/step:hkl_s/step:h', ns).text
         k = step.find('step:indexing/step:pattern/step:hkl_s/step:k', ns).text
         l = step.find('step:indexing/step:pattern/step:hkl_s/step:l', ns).text
-        h = map(float, h.split())
-        k = map(float, k.split())
-        l = map(float, l.split())
+        h = list(map(float, h.split()))
+        k = list(map(float, k.split()))
+        l = list(map(float, l.split()))
         plane = np.stack((h, k, l))
 
         # create the DAXM voxel 
