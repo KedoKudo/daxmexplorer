@@ -44,6 +44,7 @@ cdef class Eulers:
 
 cdef class OrientationMatrix:
     cdef public np.ndarray g
+    cdef public np.ndarray r
     cdef        Quaternion   __q
 
     cdef Quaternion __getq(self)

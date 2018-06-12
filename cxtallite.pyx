@@ -516,11 +516,11 @@ cdef class Eulers:
     PARAMETERS
     ----------
     phi1: double
-        first of Euler angle
+        first of Euler angle in degrees
     PHI:  double
-        second of Euler angle
+        second of Euler angle in degrees
     phi2: double
-        third of Euler angle
+        third of Euler angle in degrees
 
     METHODS
     -------
@@ -584,6 +584,7 @@ cdef class OrientationMatrix:
         cdef int i, j
 
         self.g = np.zeros((3,3), dtype=DTYPE)
+        
         for i in range(3):
             for j in range(3):
                 self.g[i,j]   = g[i,j]
@@ -591,41 +592,45 @@ cdef class OrientationMatrix:
         self.__q = self.__getq()
 
     cdef Quaternion __getq(self):
+        # this formula is based on rotation matrix
         cdef DTYPE_t trace, s, t
         cdef np.ndarray qv = np.zeros(4, dtype=DTYPE)
         cdef DTYPE_t w, x, y, z
 
+
+        self.r = np.transpose(self.g)
+        
         trace = np.trace(self.g)
         if trace > 1e-8:
             s = sqrt(trace + 1.0)*2.0
 
             qv[0] = s*0.25
-            qv[1] = (self.g[2,1] - self.g[1,2])/s
-            qv[2] = (self.g[0,2] - self.g[2,0])/s
-            qv[3] = (self.g[1,0] - self.g[0,1])/s
-        elif (self.g[0,0] > self.g[1,1]) and (self.g[0,0] > self.g[2,2]):
-            t = self.g[0,0] - self.g[1,1] - self.g[2,2] + 1.0
+            qv[1] = (self.r[2,1] - self.r[1,2])/s
+            qv[2] = (self.r[0,2] - self.r[2,0])/s
+            qv[3] = (self.r[1,0] - self.r[0,1])/s
+        elif (self.r[0,0] > self.r[1,1]) and (self.r[0,0] > self.r[2,2]):
+            t = self.r[0,0] - self.r[1,1] - self.r[2,2] + 1.0
             s = 2.0*sqrt(t)
 
-            qv[0] = (self.g[2,1] - self.g[1,2])/s
+            qv[0] = (self.r[2,1] - self.r[1,2])/s
             qv[1] = s*0.25
-            qv[2] = (self.g[0,1] + self.g[1,0])/s
-            qv[3] = (self.g[2,0] + self.g[0,2])/s
-        elif self.g[1,1] > self.g[2,2]:
-            t = -self.g[0,0] + self.g[1,1] - self.g[2,2] + 1.0
+            qv[2] = (self.r[0,1] + self.r[1,0])/s
+            qv[3] = (self.r[2,0] + self.r[0,2])/s
+        elif self.r[1,1] > self.r[2,2]:
+            t = -self.r[0,0] + self.r[1,1] - self.r[2,2] + 1.0
             s = 2.0*sqrt(t)
 
-            qv[0] = (self.g[0,2] - self.g[2,0])/s
-            qv[1] = (self.g[0,1] + self.g[1,0])/s
+            qv[0] = (self.r[0,2] - self.r[2,0])/s
+            qv[1] = (self.r[0,1] + self.r[1,0])/s
             qv[2] = s*0.25
-            qv[3] = (self.g[1,2] + self.g[2,1])/s
+            qv[3] = (self.r[1,2] + self.r[2,1])/s
         else:
-            t = -self.g[0,0] - self.g[1,1] + self.g[2,2] + 1.0
+            t = -self.r[0,0] - self.r[1,1] + self.r[2,2] + 1.0
             s = 2.0*sqrt(t)
 
-            qv[0] = (self.g[1,0] - self.g[0,1])/s
-            qv[1] = (self.g[2,0] + self.g[0,2])/s
-            qv[2] = (self.g[1,2] + self.g[2,1])/s
+            qv[0] = (self.r[1,0] - self.r[0,1])/s
+            qv[1] = (self.r[2,0] + self.r[0,2])/s
+            qv[2] = (self.r[1,2] + self.r[2,1])/s
             qv[3] = s*0.25
 
         return Quaternion(qv)

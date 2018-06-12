@@ -112,9 +112,9 @@ class DAXMvoxel(object):
         c = normalize(np.cross(astar, bstar))
         a = normalize(np.cross(bstar, cstar))
         b = normalize(np.cross(c, a))
-        # get the orientation matrix representation
-        g = np.column_stack((a, b, c))
-        return OrientationMatrix(g).toEulers()
+        # get the rotation matrix representation
+        r = np.column_stack((a, b, c))
+        return OrientationMatrix(r.T).toEulers()
 
 
     def read(self, h5file, voxelName=None):
