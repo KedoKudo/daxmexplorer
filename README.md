@@ -2,9 +2,9 @@
 
 This is a package developed for processing indexation results from __beamline 34-ID-E__ from __APS__.
 
-# Installation 
+## Installation 
 
-## Required third-party packages 
+### Required third-party packages 
 
 __DAXMexplorer__ uses _Cython_ to compile a fast module for crystallographic calculations. 
 After cloning and add the repository to your _PYTHON\_PATH_, please install Cython through 
@@ -19,7 +19,7 @@ for system Python, or use the following command if using Anaconda Python.
 conda install Cython 
 ```
 
-## Compile with GCC
+### Compile with GCC
 
 Use the following comand to compile 
 
