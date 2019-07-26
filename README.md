@@ -31,4 +31,4 @@ Now you should be able to use daxmexplorer to process your data.
 
 ## Sample usage
 
-Here are a few examples of using daxmexploer (to be continued)
+See `examples/virtualDAXM.py` for usage example.
