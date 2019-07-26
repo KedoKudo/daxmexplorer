@@ -1,0 +1,26 @@
+{
+    "taskType":     "job",
+    "name":         "Testing",
+    "dataFileName": "testOutput.dat",
+    "n_voxels":      1e5,
+    "labConfig": {
+        "k0":                [0.0, 0.0, 1.0],
+        "n_CCD":             [0.0, -1.0, 0.0],
+        "X-ray Energy(KeV)": [7, 30]
+    },
+    "DAXMConfig": {
+        "hkllist":               "/Users/chenzhang/Documents/Workbench/strainQuantification/data/hkls_FCC.txt",
+        "n_visiblePeaks range":  [10, 15, 20, 30],
+        "n_fullQ range":         [1, 3, 9],
+        "whiteNoiseLevel range": [0.0, 0.2],
+        "angR range":            [1e-3, 1e-1], 
+        "magU range":            [1e-5, 1e-3]
+    },
+    "StrainCalcConfig": {
+        "maxiter":               1e8,
+        "xtor":                  1e-10,
+        "lagmul_len range":      [1e-3, 1e1],
+        "lagmul_rot range":      [1e-3, 1e1]
+    },
+    "monitor": true
+}
