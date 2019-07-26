@@ -32,3 +32,5 @@ Now you should be able to use daxmexplorer to process your data.
 ## Sample usage
 
 See `examples/virtualDAXM.py` for usage example.
+
+> NOTE:  the example utilize the orientation library from DAMASK.
